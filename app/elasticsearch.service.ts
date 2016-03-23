@@ -17,15 +17,8 @@ export class ElasticsearchService {
                     .catch(this.handleError);
     }
 
-    getDocument(id: number, index?: string, type?: string) {
-        let documentUrl = id.toString();
-
-        if (index && type) {
-            documentUrl = '/' + type + documentUrl;
-        }
-        if (index) {
-            documentUrl = '/' + index + documentUrl;
-        }
+    getDocument(id: number, index: string, type: string) {
+        let documentUrl = '/' + index + '/' + type + '/' + id;
 
         return this.http.get(this._esUrl + documentUrl)
             .map(res => <string>res.text())
