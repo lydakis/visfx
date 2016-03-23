@@ -11,9 +11,25 @@ export class ElasticsearchService {
     getHealthString() {
         let healthUrl = '/_cat/health';
         return this.http.get(this._esUrl + healthUrl)
-            .map(res => <string>res.text())
-            .do(data => console.log(data))
-            .catch(this.handleError);
+                    .map(res => <string>res.text())
+                    .do(data => console.log(data))
+                    .catch(this.handleError);
+    }
+
+    search(query: Object, index?: string, type?: string) {
+        let searchUrl = '/_search'
+
+        if (index && type) {
+            searchUrl = '/' + type + searchUrl;
+        }
+        if(index) {
+            searchUrl = '/' + index + searchUrl;
+        }
+
+        return this.http.get(this._esUrl + searchUrl, query)
+                        .map(res => <any>res.json())
+                        .do(data => console.log(data))
+                        .catch(this.handleError);
     }
 
     private handleError(error: Response) {

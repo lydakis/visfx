@@ -13,6 +13,7 @@ import {ElasticsearchService} from './elasticsearch.service'
 })
 export class AppComponent implements OnInit{
     health = 'Loading';
+    result
     errorMessage: string;
 
     constructor(private _es: ElasticsearchService) { }
@@ -20,7 +21,16 @@ export class AppComponent implements OnInit{
     ngOnInit() {
         this._es.getHealthString()
             .subscribe(
-                health => this.health = health,
-                error => this.errorMessage = <any>error);
+            health => this.health = health,
+            error => this.errorMessage = <any>error);
+
+        let query = {
+            "query": {
+                "match_all": { }
+            }
+        }
+
+        this._es.search(query, 'nfl', '2013')
+            .subscribe();
     }
 }
