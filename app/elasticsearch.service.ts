@@ -2,6 +2,9 @@ import {Injectable} from 'angular2/core';
 import {Http, Response} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
 
+import {Transaction} from './transaction';
+import {History} from './history';
+
 @Injectable()
 export class ElasticsearchService {
     private _esUrl = 'http://localhost:9200';
@@ -12,9 +15,9 @@ export class ElasticsearchService {
         let healthUrl = '/_cat/health';
 
         return this.http.get(this._esUrl + healthUrl)
-                    .map(res => <string>res.text())
-                    .do(data => console.log(data))
-                    .catch(this.handleError);
+            .map(res => <string>res.text())
+            .do(data => console.log(data))
+            .catch(this.handleError);
     }
 
     getDocument(id: number, index: string, type: string) {
@@ -26,20 +29,14 @@ export class ElasticsearchService {
             .catch(this.handleError);
     }
 
-    search(query: Object, index?: string, type?: string) {
-        let searchUrl = '/_search'
-
-        if (index && type) {
-            searchUrl = '/' + type + searchUrl;
-        }
-        if(index) {
-            searchUrl = '/' + index + searchUrl;
-        }
+    search(query: Object, index: string, type: string) {
+        let searchUrl = '/' + index + '/' + type + '/_search'
 
         return this.http.get(this._esUrl + searchUrl, query)
-                        .map(res => <any>res.json())
-                        .do(data => console.log(data))
-                        .catch(this.handleError);
+            .map(
+                res => type === 'transaction' ? <Transaction>res.json() : <History>res.json())
+            .do(data => console.log(data))
+            .catch(this.handleError);
     }
 
     private handleError(error: Response) {
