@@ -1,0 +1,16 @@
+version: '2'
+services:
+  db:
+    image: postgres
+  search:
+    image: elasticsearch
+  web:
+    build: .
+    command: npm start
+    volumes:
+      - .:/visfx
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - search
