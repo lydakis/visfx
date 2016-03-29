@@ -1,6 +1,2 @@
 typings/
 node_modules/
-*.js
-*.js.map
-*.sublime-project
-*.sublime-workspace
