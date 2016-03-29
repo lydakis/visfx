@@ -7,13 +7,12 @@ import {ElasticsearchService} from './elasticsearch.service'
     selector: 'app',
     templateUrl: 'app/app.component.html',
     providers: [
-        HTTP_PROVIDERS, 
+        HTTP_PROVIDERS,
         ElasticsearchService
-        ]
+    ]
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
     health = 'Loading';
-    result
     errorMessage: string;
 
     constructor(private _es: ElasticsearchService) { }
@@ -26,7 +25,7 @@ export class AppComponent implements OnInit{
 
         let query = {
             "query": {
-                "match_all": { }
+                "match_all": {}
             }
         }
 

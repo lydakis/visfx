@@ -33,8 +33,7 @@ export class ElasticsearchService {
         let searchUrl = '/' + index + '/' + type + '/_search'
 
         return this.http.get(this._esUrl + searchUrl, query)
-            .map(
-                res => type === 'transaction' ? <Transaction>res.json() : <History>res.json())
+            .map(res => type === 'transaction' ? <Transaction>res.json() : <History>res.json())
             .do(data => console.log(data))
             .catch(this.handleError);
     }
