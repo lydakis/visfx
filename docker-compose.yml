@@ -1,9 +1,11 @@
 version: '2'
 services:
   db:
-    image: postgres
+    build: ./db
   search:
     image: elasticsearch
+  logstash:
+      image: logstash
   web:
     build: .
     command: npm start
