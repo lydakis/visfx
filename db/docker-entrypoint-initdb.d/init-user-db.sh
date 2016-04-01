@@ -2,10 +2,6 @@
 set -e
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
-    CREATE USER visfx;
-    CREATE DATABASE visfx;
-    GRANT ALL PRIVILEGES ON DATABASE visfx TO visfx;
-
     CREATE TABLE transaction (
         transaction_id serial PRIMARY KEY,
         provider_id integer NOT NULL,

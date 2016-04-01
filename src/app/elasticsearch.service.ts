@@ -7,7 +7,7 @@ import {History} from './history';
 
 @Injectable()
 export class ElasticsearchService {
-    private _esUrl = 'http://localhost:9200';
+    private _esUrl = 'http://search:9200';
 
     constructor(private http: Http) { }
 
