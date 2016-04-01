@@ -29,7 +29,7 @@ export class AppComponent implements OnInit {
             }
         }
 
-        this._es.search(query, 'nfl', '2013')
+        this._es.search(query, 'forex', 'history')
             .subscribe();
     }
 }

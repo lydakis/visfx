@@ -5,7 +5,7 @@ services:
     volumes:
       - ./db/data:/tmp/data
   search:
-    image: elasticsearch:latest
+    build: ./search
     command: elasticsearch -Des.network.host=0.0.0.0
     ports:
       - "9200:9200"
@@ -23,6 +23,8 @@ services:
   web:
     build: .
     command: npm start
+    volumes:
+      - .:/visfx
     ports:
       - "3000:3000"
     links:
