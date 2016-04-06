@@ -1,4 +1,4 @@
 cluster.name: visfx_1
 network.host: 0.0.0.0
 http.cors.enabled: true
-http.cors.allow-origin: 83.212.100.48:3000, 192.168.99.100:3000
+http.cors.allow-origin: *
