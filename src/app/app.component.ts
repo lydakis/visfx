@@ -14,6 +14,7 @@ import {ElasticsearchService} from './elasticsearch.service'
 export class AppComponent implements OnInit {
     health = 'Loading';
     errorMessage: string;
+    res: Object;
 
     constructor(private _es: ElasticsearchService) { }
 
@@ -25,11 +26,16 @@ export class AppComponent implements OnInit {
 
         let query = {
             "query": {
-                "match_all": {}
+                "match": {
+                    "currency_pair": "EUR/USD"
+                }
             }
         }
 
         this._es.search(query, 'forex', 'history')
-            .subscribe();
+            .subscribe(
+                res => this.res = res,
+                error => this.errorMessage = <any>error
+            );
     }
 }
