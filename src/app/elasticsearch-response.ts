@@ -23,5 +23,4 @@ export interface ElasticsearchResponse {
     timed_out: boolean;
     _shards: Shards;
     hits: Hits;
-
 }
