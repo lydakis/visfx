@@ -1,14 +1,12 @@
 export interface Transaction {
-    _timestamp: Date;
-    _version: number;
     amount: number;
     country: string;
-    currencyPair: string;
-    dateClosed: Date;
-    dateOpen: Date;
+    currency_pair: string;
+    date_closed: Date;
+    date_open: Date;
     language: string;
-    netPnl: number;
-    providerId: number;
-    transactionId: number;
-    transactionType: string;
+    net_pnl: number;
+    provider_id: number;
+    transaction_id: number;
+    transaction_type: string;
 }

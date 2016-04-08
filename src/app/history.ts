@@ -1,9 +1,7 @@
 export interface History {
-    _timestamp: Date;
-    _version: number;
-    askPrice: number;
-    bidPrice: number;
-    currencyPair: string;
-    historyId: number;
-    tickDate: Date;
+    ask_price: number;
+    bid_price: number;
+    currency_pair: string;
+    history_id: number;
+    tick_date: Date;
 }
