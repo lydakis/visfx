@@ -27,7 +27,7 @@ export class ElasticsearchService {
         let documentUrl = '/' + index + '/' + type + '/' + id;
 
         return this.http.get(this._esUrl + documentUrl)
-            .map(res => this.processResponse(res.json()))
+            .map(res => this.processGeneralResponse(res.json()))
             .do(data => console.log(data))
             .catch(this.handleError);
     }
