@@ -1,5 +1,5 @@
-import {Component} from 'angular2/core';
-import {CHART_DIRECTIVES} from 'angular2-highcharts';
+import {Component, OnChanges, Input} from 'angular2/core';
+import {CHART_DIRECTIVES, Highcharts} from 'angular2-highcharts';
 
 @Component({
     selector: 'line-chart',
@@ -10,19 +10,31 @@ import {CHART_DIRECTIVES} from 'angular2-highcharts';
         </chart>
     `
 })
-export class LineChartComponent {
-    constructor() {
+export class LineChartComponent implements OnChanges {
+    @Input() series: Object[];
+    @Input() title: string;
+    @Input() xAxis: Object;
+    @Input() yAxis: Object;
+
+    ngOnChanges() {
         this.options = {
-          chart: { type: 'spline' },
-          title: { text : 'EUR/USD'},
-          series: [{ data: [2,3,5,8,13] }]
+            title: { text : this.title },
+            xAxis: this.xAxis,
+            yAxis: this.yAxis,
+            series: this.series
         };
-        setInterval(() => this.chart.series[0].addPoint(Math.random() * 10), 1000);
+
+        // setInterval(() => this.chart.series[0].addPoint(Math.random() * 10), 1000);
     }
 
     chart: HighchartsChartObject;
     options: HighchartsOptions;
+
     saveInstance(chartInstance) {
         this.chart = chartInstance;
+    }
+
+    addPoints() {
+
     }
 }

@@ -121,7 +121,6 @@ export class ElasticsearchService {
 
     private processHistoryResponseForCharts(res: ElasticsearchResponse) {
         let results = res.hits.hits;
-        let aggs = res.aggregations.resolution.buckets;
         let series = [
             {
                 name: (<History>results[0]._source).currency_pair + ' Ask',
@@ -135,16 +134,26 @@ export class ElasticsearchService {
 
         if (undefined === res.aggregations) {
             for (let i = 0; i < results.length; i++) {
-                series[0].data[i] = (<History>results[i]._source).ask_price;
-                series[1].data[i] = (<History>results[i]._source).bid_price;
+                let date = Date.parse(
+                    (<History>results[i]._source).tick_date.toString());
+
+                series[0].data[i] = [
+                    date, (<History>results[i]._source).ask_price];
+                series[1].data[i] = [
+                    date, (<History>results[i]._source).bid_price];
             }
         }
         else {
+            let aggs = res.aggregations.resolution.buckets;
+
             for (let i = 0; i < aggs.length; i++) {
-                series[0].data[i] = aggs[i].avg_ask.value;
-                series[1].data[i] = aggs[i].avg_bid.value;
+                series[0].data[i] = [aggs[i].key, aggs[i].avg_ask.value];
+                series[1].data[i] = [aggs[i].key, aggs[i].avg_bid.value];
             }
         }
+
+        series[0].data = series[0].data.sort((a, b) => a[0] - b[0]);
+        series[1].data = series[1].data.sort((a, b) => a[0] - b[0]);
 
         return series;
     }

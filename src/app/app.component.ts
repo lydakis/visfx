@@ -1,9 +1,10 @@
 import {Component, OnInit} from 'angular2/core';
-import {HTTP_PROVIDERS}    from 'angular2/http';
+import {HTTP_PROVIDERS, JSONP_PROVIDERS}    from 'angular2/http';
 
 import {ElasticsearchService} from './elasticsearch.service'
 import {TimeResolution} from './time-resolution'
 import {LineChartComponent} from './line-chart.component';
+import {StockChartComponent} from './stock-chart.component';
 
 @Component({
     selector: 'app',
@@ -15,14 +16,20 @@ import {LineChartComponent} from './line-chart.component';
     `],
     providers: [
         HTTP_PROVIDERS,
+        JSONP_PROVIDERS,
         ElasticsearchService,
     ],
-    directives: [LineChartComponent]
+    directives: [
+        LineChartComponent,
+        StockChartComponent
+    ]
 })
 export class AppComponent implements OnInit {
     health = 'Loading';
     errorMessage: string;
     res: Object;
+    title = 'EUR/USD';
+    data: Object[];
 
     constructor(private _es: ElasticsearchService) { }
 
@@ -51,8 +58,9 @@ export class AppComponent implements OnInit {
             '2015-01-01', '2015-12-31',
             TimeResolution.W1)
             .subscribe(
-                res => this.res = res,
+                res => this.data = res,
                 error => this.errorMessage = <any>error
             );
+
     }
 }
