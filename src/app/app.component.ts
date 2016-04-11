@@ -41,8 +41,8 @@ export class AppComponent implements OnInit {
 
         this._es.getHistory(
             'EUR/USD',
-            '2015-01-01', '2015-03-01',
-            TimeResolution.M15)
+            '2015-01-01', '2015-12-31',
+            TimeResolution.W1)
             .subscribe(
                 res => this.res = res,
                 error => this.errorMessage = <any>error

@@ -1,26 +1,41 @@
-interface Shards {
-    total: number;
-    succesful: number;
-    failed: number;
-}
-
-interface Hits {
-    total: number;
-    max_score: number;
-    hits: Hit[];
-}
-
-interface Hit {
-    _index: string;
-    _type: string;
-    _id: string;
-    _score: number;
-    _source: Object;
-}
-
 export interface ElasticsearchResponse {
     took: number;
     timed_out: boolean;
-    _shards: Shards;
-    hits: Hits;
+    _shards: {
+        total: number,
+        succesful: number,
+        failed: number
+    };
+    hits: {
+        total: number,
+        max_score: number,
+        hits: {
+            _index: string,
+            _type: string,
+            _id: string,
+            _score: number,
+            _source: Object
+        }[]
+    };
+    aggregations: {
+        resolution: {
+            buckets: {
+                key_as_string: string,
+                key: number,
+                doc_count: number,
+                avg_ask: {
+                    value: number
+                },
+                avg_bid: {
+                    value: number
+                },
+                median_ask: {
+                    values
+                },
+                median_bis: {
+                    values
+                }
+            }[]
+        }
+    };
 }
