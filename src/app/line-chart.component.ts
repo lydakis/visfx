@@ -23,8 +23,6 @@ export class LineChartComponent implements OnChanges {
             yAxis: this.yAxis,
             series: this.series
         };
-
-        // setInterval(() => this.chart.series[0].addPoint(Math.random() * 10), 1000);
     }
 
     chart: HighchartsChartObject;
@@ -32,9 +30,5 @@ export class LineChartComponent implements OnChanges {
 
     saveInstance(chartInstance) {
         this.chart = chartInstance;
-    }
-
-    addPoints() {
-
     }
 }

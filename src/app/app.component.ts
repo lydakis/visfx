@@ -39,20 +39,6 @@ export class AppComponent implements OnInit {
             health => this.health = health,
             error => this.errorMessage = <any>error);
 
-        // let query = {
-        //     "query": {
-        //         "match": {
-        //             "currency_pair": "EUR/USD"
-        //         }
-        //     }
-        // }
-        //
-        // this._es.search(query, 'forex', 'history')
-            // .subscribe(
-            //     res => this.res = res,
-            //     error => this.errorMessage = <any>error
-            // );
-
         this._es.getHistory(
             'EUR/USD',
             '2015-01-01', '2015-12-31',
@@ -61,6 +47,5 @@ export class AppComponent implements OnInit {
                 res => this.data = res,
                 error => this.errorMessage = <any>error
             );
-
     }
 }

@@ -85,18 +85,6 @@ export class ElasticsearchService {
                             "avg": {
                                 "field": "ask_price"
                             }
-                        },
-                        "median_bid": {
-                            "percentiles": {
-                                "field": "bid_price",
-                                "percents": [50]
-                            }
-                        },
-                        "median_ask": {
-                            "percentiles": {
-                                "field": "bid_ask",
-                                "percents": [50]
-                            }
                         }
                     }
                 }
