@@ -21,10 +21,10 @@ services:
       - db
       - search
   web:
-    build: .
+    build: ./web
     command: npm start
     volumes:
-      - .:/visfx
+      - ./web:/visfx
     ports:
       - "3000:3000"
     links:
