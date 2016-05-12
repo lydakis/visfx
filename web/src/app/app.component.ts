@@ -1,51 +1,55 @@
-import {Component, OnInit} from 'angular2/core';
-import {HTTP_PROVIDERS, JSONP_PROVIDERS}    from 'angular2/http';
+import {Component} from 'angular2/core';
+import {HTTP_PROVIDERS, JSONP_PROVIDERS} from 'angular2/http';
+import {FORM_PROVIDERS} from 'angular2/common';
+import {
+    RouteConfig,
+    ROUTER_DIRECTIVES,
+    ROUTER_PROVIDERS,
+} from 'angular2/router';
 
-import {ElasticsearchService} from './elasticsearch.service'
-import {TimeResolution} from './time-resolution'
-import {LineChartComponent} from './line-chart.component';
-import {StockChartComponent} from './stock-chart.component';
+import {DashboardComponent} from './dashboard.component';
 
+@RouteConfig([
+    {path: '/', component: DashboardComponent, name: 'Dashboard'},
+])
 @Component({
     selector: 'app',
     templateUrl: 'app/app.component.html',
-    styles: [`
-        chart {
-            display: block;
-        }
-    `],
+    styleUrls: ['app/app.component.css'],
     providers: [
-        HTTP_PROVIDERS,
-        JSONP_PROVIDERS,
-        ElasticsearchService,
+        ROUTER_PROVIDERS, FORM_PROVIDERS, HTTP_PROVIDERS
     ],
-    directives: [
-        LineChartComponent,
-        StockChartComponent
-    ]
+    directives: [ROUTER_DIRECTIVES]
 })
-export class AppComponent implements OnInit {
-    health = 'Loading';
-    errorMessage: string;
-    res: Object;
-    title = 'EUR/USD';
-    data: Object[];
+export class AppComponent {
+    mobileView:number = 992;
+    toggle:boolean = false;
 
-    constructor(private _es: ElasticsearchService) { }
-
-    ngOnInit() {
-        this._es.getHealthString()
-            .subscribe(
-            health => this.health = health,
-            error => this.errorMessage = <any>error);
-
-        this._es.getHistory(
-            'EUR/USD',
-            '2015-01-01', '2015-12-31',
-            TimeResolution.W1)
-            .subscribe(
-                res => this.data = res,
-                error => this.errorMessage = <any>error
-            );
+    constructor() {
+        this.attachEvents();
     }
+
+    attachEvents() {
+        window.onresize = ()=> {
+            if (this.getWidth() >= this.mobileView) {
+                if (localStorage.getItem('toggle')) {
+                    this.toggle = !localStorage.getItem('toggle') ? false : true;
+                } else {
+                    this.toggle = true;
+                }
+            } else {
+                this.toggle = false;
+            }
+        }
+    }
+
+    getWidth() {
+        return window.innerWidth;
+    }
+
+    toggleSidebar() {
+        this.toggle = !this.toggle;
+        localStorage.setItem('toggle', this.toggle.toString());
+    }
+
 }
