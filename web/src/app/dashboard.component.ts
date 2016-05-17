@@ -1,12 +1,12 @@
-import {Component, OnInit} from 'angular2/core';
-import {HTTP_PROVIDERS}    from 'angular2/http';
+import {Component, OnInit} from '@angular/core';
+import {HTTP_PROVIDERS}    from '@angular/http';
 
 import {ElasticsearchService} from './elasticsearch.service'
 import {TimeResolution} from './time-resolution'
 import {LineChartComponent} from './line-chart.component';
 import {StockChartComponent} from './stock-chart.component';
 import {TreeMapComponent} from './tree-map.component';
-import {DatePickerComponent} from './date-picker.component';
+// import {DatePickerComponent} from './date-picker.component';
 
 @Component({
     selector: 'dashboard',
@@ -24,7 +24,7 @@ import {DatePickerComponent} from './date-picker.component';
         LineChartComponent,
         StockChartComponent,
         TreeMapComponent,
-        DatePickerComponent
+        // DatePickerComponent
     ]
 })
 export class DashboardComponent implements OnInit {

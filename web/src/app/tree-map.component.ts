@@ -1,4 +1,4 @@
-import {Component, OnChanges, Input} from 'angular2/core';
+import {Component, OnChanges, Input} from '@angular/core';
 import {CHART_DIRECTIVES, Highcharts} from 'angular2-highcharts';
 
 @Component({

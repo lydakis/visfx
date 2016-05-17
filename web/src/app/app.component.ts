@@ -1,6 +1,6 @@
-import {Component} from 'angular2/core';
-import {HTTP_PROVIDERS, JSONP_PROVIDERS} from 'angular2/http';
-import {FORM_PROVIDERS} from 'angular2/common';
+import {Component} from '@angular/core';
+import {HTTP_PROVIDERS, JSONP_PROVIDERS} from '@angular/http';
+import {FORM_PROVIDERS} from '@angular/common';
 import {
     RouteConfig,
     ROUTER_DIRECTIVES,
