@@ -1,5 +1,4 @@
 import {Component, OnChanges, Input} from 'angular2/core';
-import {Jsonp} from 'angular2/http';
 import {CHART_DIRECTIVES, Highcharts} from 'angular2-highcharts';
 
 @Component({
@@ -14,7 +13,8 @@ export class StockChartComponent implements OnChanges {
     ngOnChanges() {
         this.options = {
             title : { text : this.title },
-            series : this.series
+            series : this.series,
+            credits: false
         };
     }
     options: HighstockOptions;

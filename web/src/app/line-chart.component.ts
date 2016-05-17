@@ -21,7 +21,8 @@ export class LineChartComponent implements OnChanges {
             title: { text : this.title },
             xAxis: this.xAxis,
             yAxis: this.yAxis,
-            series: this.series
+            series: this.series,
+            credits: false
         };
     }
 
