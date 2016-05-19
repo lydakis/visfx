@@ -1,9 +1,13 @@
-import {Component} from '@angular/core';
-import {CORE_DIRECTIVES, FORM_DIRECTIVES} from '@angular/common';
+import {Component, Self} from '@angular/core';
+import {
+    NgModel, ControlValueAccessor,
+    CORE_DIRECTIVES, FORM_DIRECTIVES} from '@angular/common';
 import {TimepickerComponent} from 'ng2-bootstrap/ng2-bootstrap';
 
+import {DatetimeRange} from './datetime-range';
+
 @Component({
-    selector: 'date-picker',
+    selector: 'date-picker[ngModel]',
     templateUrl: 'app/date-picker.component.html',
     directives: [
         TimepickerComponent,
@@ -11,117 +15,125 @@ import {TimepickerComponent} from 'ng2-bootstrap/ng2-bootstrap';
         FORM_DIRECTIVES
     ]
 })
-export class DatePickerComponent {
-    date: Date = new Date();
-    years: number = this.date.getFullYear();
-    monthsInt: number = this.date.getMonth() - 1;
-    months: string;
-    days: number = this.date.getDay();
-    maxMonths: number = 11;
-    minMonths: number = 0;
-    _maxDays: number;
-    minDays: number = 1;
+export class DatePickerComponent implements ControlValueAccessor {
+    dr: NgModel;
+    daterange: DatetimeRange = new DatetimeRange();
+    private _selected: DatetimeRange = new DatetimeRange();
 
-    constructor() {
-        this.months = this.monthsDictionary[this.monthsInt];
+    public onChange:any = Function.prototype;
+    public onTouched:any = Function.prototype;
+
+    private get selected(): DatetimeRange {
+        return this._selected;
     }
 
-    private monthsDictionary = {
-        0: "Jan",
-        1: "Feb",
-        2: "Mar",
-        3: "Apr",
-        4: "May",
-        5: "Jun",
-        6: "Jul",
-        7: "Aug",
-        8: "Sept",
-        9: "Oct",
-        10: "Nov",
-        11: "Dec"
-    }
-
-    private get maxDays(): number {
-        let m30 = [3, 5, 8, 10];
-        let m31 = [0, 2, 4, 6, 7, 9, 11];
-
-        if (m31.includes(this.monthsInt)) {
-            this._maxDays = 31;
+    private set selected(v: DatetimeRange) {
+        if (v) {
+            this._selected = v;
+            this.dr.viewToModelUpdate(this.selected);
         }
-        else if (m30.includes(this.monthsInt)) {
-            this._maxDays = 30;
+    }
+
+    constructor( @Self() dr: NgModel) {
+        this.dr = dr;
+        dr.valueAccessor = this;
+    }
+
+    public writeValue(v: any): void {
+        if (v === this.selected) {
+            return;
         }
-        else if (this.years % 4 == 0) {
-            this._maxDays = 29;
+        if (v && v instanceof DatetimeRange) {
+            this.selected = v;
+            return;
         }
-        else {
-            this._maxDays = 28;
-        }
-
-        return this._maxDays
+        this.selected = v ? new DatetimeRange(v) : void 0;
     }
 
-    changed(): void {
-        console.log('Time changed to: ' + this.date);
+    public registerOnChange(fn: (_: any) => {}): void { this.onChange = fn; }
+
+    public registerOnTouched(fn: () => {}): void { this.onTouched = fn; }
+
+    protected incrementStartYears(): void {
+        this.daterange.startYear += 1;
+        this.selected = this.daterange;
     }
 
-    protected incrementYears(): void {
-        this.years += 1;
-        this.date.setFullYear(this.years);
+    protected decrementStartYears(): void {
+        this.daterange.startYear -=1;
+        this.selected = this.daterange;
     }
 
-    protected decrementYears(): void {
-        this.years -= 1;
-        this.date.setFullYear(this.years);
+    protected incrementEndYears(): void {
+        this.daterange.endYear += 1;
+        this.selected = this.daterange;
     }
 
-    protected updateYears(): void {
-
+    protected decrementEndYears(): void {
+        this.daterange.endYear -=1;
+        this.selected = this.daterange;
     }
 
-    protected incrementMonths(): void {
-        this.monthsInt = (this.monthsInt + 1) % 12;
-        this.date.setMonth(this.monthsInt + 1);
-        this.months = this.monthsDictionary[this.monthsInt];
+    protected incrementStartMonths(): void {
+        this.daterange.startMonth =
+            (this.daterange.startMonth + 1) > this.daterange.maxMonth ?
+            this.daterange.minMonth : this.daterange.startMonth + 1;
+        this.selected = this.daterange;
     }
 
-    private noIncrementMonths(): boolean {
-        let incrementSelected = this.monthsInt + 1;
-        console.log(incrementSelected > this.maxMonths);
-        return incrementSelected > this.maxMonths;
+    protected decrementStartMonths(): void {
+        this.daterange.startMonth =
+            (this.daterange.startMonth - 1) < this.daterange.minMonth ?
+            this.daterange.maxMonth : this.daterange.startMonth - 1;
+        this.selected = this.daterange;
     }
 
-    protected decrementMonths(): void {
-        this.monthsInt =
-            this.monthsInt - 1 < this.minMonths ? this.maxMonths : this.monthsInt - 1;
-        this.date.setMonth(this.monthsInt + 1);
-        this.months = this.monthsDictionary[this.monthsInt];
+    protected incrementEndMonths(): void {
+        this.daterange.endMonth =
+            (this.daterange.endMonth + 1) > this.daterange.maxMonth ?
+            this.daterange.minMonth : this.daterange.endMonth + 1;
+        this.selected = this.daterange;
     }
 
-    private noDecrementMonths(): boolean {
-        let decrementSelected = this.monthsInt - 1;
-        return decrementSelected < this.minMonths;
+    protected decrementEndMonths(): void {
+        this.daterange.endMonth =
+            (this.daterange.endMonth - 1) < this.daterange.minMonth ?
+            this.daterange.maxMonth : this.daterange.endMonth - 1;
+        this.selected = this.daterange;
     }
 
-    protected incrementDays(): void {
-        this.days = this.days + 1 > this.maxDays ? this.minDays : this.days + 1;
-        this.date.setDate(this.days);
+    protected incrementStartDays(): void {
+        this.daterange.startDay =
+            (this.daterange.startDay + 1) > this.daterange.maxDay(
+                this.daterange.startMonth, this.daterange.startYear) ?
+            this.daterange.minDay : this.daterange.startDay + 1;
+        this.selected = this.daterange;
     }
 
-    private noIncrementDays(): boolean {
-        let incrementSelected = this.days + 1;
-        return incrementSelected > this.maxDays;
+    protected decrementStartDays(): void {
+        this.daterange.startDay =
+            (this.daterange.startDay - 1) < this.daterange.minDay ?
+            this.daterange.maxDay(
+                this.daterange.startMonth, this.daterange.startYear) :
+            this.daterange.startDay - 1;
+        this.selected = this.daterange;
     }
 
-    protected decrementDays(): void {
-        this.days =
-            this.days - 1 < this.minDays ? this.maxDays + 1 : this.days - 1;
-        this.date.setDate(this.days);
+    protected incrementEndDays(): void {
+        this.daterange.endDay =
+            (this.daterange.endDay + 1) > this.daterange.maxDay(
+                this.daterange.endMonth, this.daterange.endYear) ?
+            this.daterange.minDay : this.daterange.endDay + 1;
+        this.selected = this.daterange;
     }
 
-    private noDecrementDays(): boolean {
-        let decrementSelected = this.days - 1;
-        return decrementSelected < this.minDays;
+    protected decrementEndDays(): void {
+        this.daterange.endDay =
+            (this.daterange.endDay - 1) < this.daterange.minDay ?
+            this.daterange.maxDay(
+                this.daterange.endMonth, this.daterange.endYear) :
+            this.daterange.endDay - 1;
+        this.selected = this.daterange;
     }
 
 }

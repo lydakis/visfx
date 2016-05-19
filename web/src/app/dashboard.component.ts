@@ -7,6 +7,7 @@ import {LineChartComponent} from './line-chart.component';
 import {StockChartComponent} from './stock-chart.component';
 import {TreeMapComponent} from './tree-map.component';
 import {DatePickerComponent} from './date-picker.component';
+import {DatetimeRange} from './datetime-range';
 
 @Component({
     selector: 'dashboard',
@@ -32,6 +33,7 @@ export class DashboardComponent implements OnInit {
     res: Object;
     title = 'EUR/USD';
     data: Object[];
+    date: DatetimeRange = new DatetimeRange();
 
 
     constructor(private _es: ElasticsearchService) { }
