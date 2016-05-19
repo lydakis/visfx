@@ -6,7 +6,7 @@ import {TimeResolution} from './time-resolution'
 import {LineChartComponent} from './line-chart.component';
 import {StockChartComponent} from './stock-chart.component';
 import {TreeMapComponent} from './tree-map.component';
-// import {DatePickerComponent} from './date-picker.component';
+import {DatePickerComponent} from './date-picker.component';
 
 @Component({
     selector: 'dashboard',
@@ -24,7 +24,7 @@ import {TreeMapComponent} from './tree-map.component';
         LineChartComponent,
         StockChartComponent,
         TreeMapComponent,
-        // DatePickerComponent
+        DatePickerComponent
     ]
 })
 export class DashboardComponent implements OnInit {

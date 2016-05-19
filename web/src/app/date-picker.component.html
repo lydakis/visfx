@@ -1,5 +1,39 @@
-<!-- <div class="row">
-    <div class="col-md-3">
-        <timepicker [(ngModel)]="mytime" (change)="changed()" [hourStep]="hstep" [minuteStep]="mstep" [showMeridian]="ismeridian"></timepicker>
+<div class="row">
+    <div class="col-md-2">
+        <table>
+            <tbody>
+                <tr class="text-center">
+                    <td><a (click)="incrementYears()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
+                    <td>&nbsp;</td>
+                    <td><a (click)="incrementMonths()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
+                    <td>&nbsp;</td>
+                    <td><a (click)="incrementDays()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
+                </tr>
+                <tr>
+                    <td class="form-group">
+                        <input style="width:70px;" type="text" [(ngModel)]="years" (change)="updateHours()" class="form-control text-center" maxlength="4">
+                    </td>
+                    <td> </td>
+                    <td class="form-group">
+                        <input style="width:60px;" type="text" [(ngModel)]="months" (change)="updateMinutes()" class="form-control text-center" maxlength="3">
+                    </td>
+                    <td> </td>
+                    <td class="form-group">
+                        <input style="width:50px;" type="text" [(ngModel)]="days" (change)="updateMinutes()" class="form-control text-center" maxlength="2">
+                    </td>
+                    <td> </td>
+                </tr>
+                <tr class="text-center">
+                    <td><a (click)="decrementYears()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
+                    <td>&nbsp;</td>
+                    <td><a (click)="decrementMonths()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
+                    <td>&nbsp;</td>
+                    <td><a (click)="decrementDays()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-</div> -->
+    <div class="col-md-2">
+        <timepicker [(ngModel)]="date" (change)="changed()" [hourStep]="1" [minuteStep]="1" [showMeridian]="true"></timepicker>
+    </div>
+</div>
