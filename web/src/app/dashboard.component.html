@@ -4,9 +4,11 @@
     </div>
 </div>
 <div class="row">
+    <div class="col-md-6">
+        <showcase [daterange]="date"></showcase>
+    </div>
+</div>
+<div class="row">
     <div class="col-md-6"><line-chart [series]="data" [title]="title"></line-chart></div>
     <div class="col-md-6"><stock-chart [series]="data" [title]="title"></stock-chart></div>
 </div>
-<!-- <div class="row">
-    <div class="col-md-12"><tree-map [treeMapData]="testData" title="Test"></tree-map></div>
-</div> -->

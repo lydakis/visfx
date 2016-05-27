@@ -61,7 +61,7 @@ export class ElasticsearchService {
                     "tick_date": {
                         "gte": startDate,
                         "lte": endDate,
-                        "format": "yyyy-MM-dd"
+                        "format": "strict_date_time"
                     }
                 }
             }
@@ -70,20 +70,31 @@ export class ElasticsearchService {
         if (TimeResolution.T !== resolution) {
             query["size"] = 1;
             query["aggs"] = {
-                "resolution": {
-                    "date_histogram": {
+                "range": {
+                    "date_range": {
                         "field": "tick_date",
-                        "interval": resolution
+                        "format": "strict_date_time",
+                        "ranges": [
+                            { "from": startDate, "to": endDate },
+                        ]
                     },
                     "aggs": {
-                        "avg_bid": {
-                            "avg": {
-                                "field": "bid_price"
-                            }
-                        },
-                        "avg_ask": {
-                            "avg": {
-                                "field": "ask_price"
+                        "resolution": {
+                            "date_histogram": {
+                                "field": "tick_date",
+                                "interval": resolution
+                            },
+                            "aggs": {
+                                "avg_bid": {
+                                    "avg": {
+                                        "field": "bid_price"
+                                    }
+                                },
+                                "avg_ask": {
+                                    "avg": {
+                                        "field": "ask_price"
+                                    }
+                                }
                             }
                         }
                     }
@@ -108,6 +119,7 @@ export class ElasticsearchService {
     }
 
     private processHistoryResponseForCharts(res: ElasticsearchResponse) {
+        console.log(res);
         let results = res.hits.hits;
         let series = [
             {
@@ -132,7 +144,7 @@ export class ElasticsearchService {
             }
         }
         else {
-            let aggs = res.aggregations.resolution.buckets;
+            let aggs = res.aggregations.range.buckets[0].resolution.buckets;
 
             for (let i = 0; i < aggs.length; i++) {
                 series[0].data[i] = [aggs[i].key, aggs[i].avg_ask.value];

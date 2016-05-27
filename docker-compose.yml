@@ -1,31 +1,31 @@
 version: '2'
 services:
-  db:
-    build: ./db
-    volumes:
-      - ./db/data:/tmp/data
-  search:
-    build: ./search
-    command: elasticsearch -Des.network.host=0.0.0.0
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-  logstash:
-    image: logstash:latest
-    command: logstash -f /etc/logstash/conf.d/logstash.conf
-    volumes:
-      - ./logstash/config:/etc/logstash/conf.d
-    ports:
-      - "5000:5000"
-    links:
-      - db
-      - search
-  web:
-    build: ./web
-    command: npm start
-    volumes:
-      - ./web:/visfx
-    ports:
-      - "3000:3000"
-    links:
-      - search
+    db:
+        build: ./db
+        volumes:
+            - ./db/data:/tmp/data
+    search:
+        build: ./search
+        command: elasticsearch -Des.network.host=0.0.0.0
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+    logstash:
+        image: logstash:latest
+        command: logstash -f /etc/logstash/conf.d/logstash.conf
+        volumes:
+            - ./logstash/config:/etc/logstash/conf.d
+        ports:
+            - "5000:5000"
+        links:
+            - db
+            - search
+    web:
+        build: ./web
+        command: npm start
+        volumes:
+            - ./web:/visfx
+        ports:
+            - "3000:3000"
+        links:
+            - search

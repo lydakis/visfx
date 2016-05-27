@@ -8,6 +8,7 @@ import {StockChartComponent} from './stock-chart.component';
 import {TreeMapComponent} from './tree-map.component';
 import {DatePickerComponent} from './date-picker.component';
 import {DatetimeRange} from './datetime-range';
+import {ShowcaseComponent} from './showcase.component';
 
 @Component({
     selector: 'dashboard',
@@ -25,10 +26,12 @@ import {DatetimeRange} from './datetime-range';
         LineChartComponent,
         StockChartComponent,
         TreeMapComponent,
-        DatePickerComponent
+        DatePickerComponent,
+        ShowcaseComponent
     ]
 })
 export class DashboardComponent implements OnInit {
+    dashboardTitle: string = "FX Dashboard";
     errorMessage: string;
     res: Object;
     title = 'EUR/USD';
@@ -41,7 +44,7 @@ export class DashboardComponent implements OnInit {
     ngOnInit() {
         this._es.getHistory(
             'EUR/USD',
-            '2015-01-01', '2015-12-31',
+            '2015-01-01T00:00:00.000Z', '2015-12-31T00:00:00.000Z',
             TimeResolution.W1)
             .subscribe(
             res => this.data = res,

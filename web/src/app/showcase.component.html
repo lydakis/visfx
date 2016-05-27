@@ -1,0 +1,41 @@
+<div class="row">
+    <div class="col-md-4">
+        <div class="btn-group" dropdown [(isOpen)]="currencyStatus.isopen">
+            <button id="single-button" type="button" class="btn btn-primary" dropdownToggle>
+                Select Currency Pair <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="single-button">
+                <li role="menuitem" *ngFor="let pair of currencyPairs">
+                    <a class="dropdown-item" (click)="getCurrencySelection(pair)" href="#">{{pair}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="btn-group" dropdown [(isOpen)]="chartTypeStatus.isopen">
+            <button id="single-button" type="button" class="btn btn-primary" dropdownToggle>
+                Select Chart Type <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="single-button">
+                <li role="menuitem" *ngFor="let type of chartTypes">
+                    <a class="dropdown-item" (click)="getChartSelection(type)" href="#">{{type}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div [ngSwitch]="chartType">
+            <template ngSwitchWhen="Line Chart">
+                <line-chart [series]="data" [title]="currencyPair"></line-chart>
+            </template>
+            <template ngSwitchWhen="Stock Chart">
+                <stock-chart [series]="data" [title]="currencyPair"></stock-chart>
+            </template>
+            <template ngSwitchDefault>
+                <stock-chart title=" "></stock-chart>
+            </template>
+        </div>
+    </div>
+</div>

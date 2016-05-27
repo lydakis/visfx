@@ -18,24 +18,35 @@ export interface ElasticsearchResponse {
         }[]
     };
     aggregations: {
-        resolution: {
+        range: {
             buckets: {
-                key_as_string: string,
-                key: number,
                 doc_count: number,
-                avg_ask: {
-                    value: number
+                from: number,
+                from_as_string: string,
+                key: string,
+                resolution: {
+                    buckets: {
+                        key_as_string: string,
+                        key: number,
+                        doc_count: number,
+                        avg_ask: {
+                            value: number
+                        },
+                        avg_bid: {
+                            value: number
+                        },
+                        median_ask: {
+                            values
+                        },
+                        median_bis: {
+                            values
+                        }
+                    }[]
                 },
-                avg_bid: {
-                    value: number
-                },
-                median_ask: {
-                    values
-                },
-                median_bis: {
-                    values
-                }
+                to: number,
+                to_as_string: string
             }[]
         }
+
     };
 }

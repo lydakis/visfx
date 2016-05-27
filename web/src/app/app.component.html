@@ -11,7 +11,11 @@
             </li>
             <li class="sidebar-title"><span>NAVIGATION</span></li>
             <li class="sidebar-list">
-                <a [routerLink]="['Dashboard']">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
+                <a [routerLink]="['/']">FX Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
+                <a [routerLink]="['/currency']">Currency Stats <span class="menu-icon fa fa-tachometer"></span></a>
+                <a [routerLink]="['/country']">Country Stats <span class="menu-icon fa fa-tachometer"></span></a>
+                <a [routerLink]="['/provider']">Provider Stats <span class="menu-icon fa fa-tachometer"></span></a>
+
             </li>
         </ul>
         <div class="sidebar-footer">
@@ -46,7 +50,13 @@
                             Visfx
                         </div>
                         <div class="breadcrumb-links">
-                            Home / Dashboard
+                            <div [ngSwitch]="selectedPage">
+                                <template ngSwitchWhen="/">Home / FX Dashboard </template>
+                                <template ngSwitchWhen="/currency">Home / Currency Stats </template>
+                                <template ngSwitchWhen="/country">Home / Country Stats </template>
+                                <template ngSwitchWhen="/provider">Home / Provider Stats </template>
+                                <template ngSwitchDefault>Home / FX Dashboard </template>
+                            </div>
                         </div>
                     </div>
                 </div>

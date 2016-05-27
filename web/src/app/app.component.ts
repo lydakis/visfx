@@ -2,15 +2,20 @@ import {Component} from '@angular/core';
 import {HTTP_PROVIDERS, JSONP_PROVIDERS} from '@angular/http';
 import {FORM_PROVIDERS} from '@angular/common';
 import {
-    RouteConfig,
+    Router,
+    Routes,
     ROUTER_DIRECTIVES,
     ROUTER_PROVIDERS,
-} from 'angular2/router';
+
+} from '@angular/router';
 
 import {DashboardComponent} from './dashboard.component';
 
-@RouteConfig([
-    {path: '/', component: DashboardComponent, name: 'Dashboard'},
+@Routes([
+    { path: '/', component: DashboardComponent },
+    { path: '/currency', component: DashboardComponent },
+    { path: '/country', component: DashboardComponent },
+    { path: '/provider', component: DashboardComponent },
 ])
 @Component({
     selector: 'app',
@@ -24,9 +29,26 @@ import {DashboardComponent} from './dashboard.component';
 export class AppComponent {
     mobileView:number = 992;
     toggle:boolean = false;
+    selectedPage: string;
 
-    constructor() {
+    constructor(private router: Router) {
         this.attachEvents();
+        console.log(router.urlTree.contains(router.createUrlTree(['/currency'])));
+        router.changes.subscribe(() => {
+            if (router.urlTree.contains(router.createUrlTree(['/']))) {
+                this.selectedPage = "/";
+            }
+            if (router.urlTree.contains(router.createUrlTree(['/currency']))) {
+                console.log("test");
+                this.selectedPage = "/currency";
+            }
+            if (router.urlTree.contains(router.createUrlTree(['/country']))) {
+                this.selectedPage = "/country";
+            }
+            if (router.urlTree.contains(router.createUrlTree(['/provider']))) {
+                this.selectedPage = "/provider";
+            }
+        })
     }
 
     attachEvents() {
