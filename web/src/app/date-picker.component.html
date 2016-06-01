@@ -1,102 +1,102 @@
 <div class="row">
-    <div class="col-md-6">
-        <table>
-            <tbody>
+  <div class="col-md-6">
+    <table>
+      <tbody>
+        <tr class="text-center">
+          <td>
+            <span>Start Date:&nbsp;</span>
+          </td>
+          <td>
+            <table>
+              <tbody>
                 <tr class="text-center">
-                    <td>
-                        <span>Start Date:&nbsp;</span>
-                    </td>
-                    <td>
-                        <table>
-                            <tbody>
-                                <tr class="text-center">
-                                    <td><a (click)="incrementStartYears()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
-                                    <td>&nbsp;</td>
-                                    <td><a (click)="incrementStartMonths()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
-                                    <td>&nbsp;</td>
-                                    <td><a (click)="incrementStartDays()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
-                                </tr>
-                                <tr>
-                                    <td class="form-group">
-                                        <input style="width:70px;" type="text" [(ngModel)]="daterange.startYear" (change)="updateHours()" class="form-control text-center" maxlength="4">
-                                    </td>
-                                    <td> </td>
-                                    <td class="form-group">
-                                        <input style="width:60px;" type="text" [(ngModel)]="daterange.startMonthString" (change)="updateMinutes()" class="form-control text-center" maxlength="3">
-                                    </td>
-                                    <td> </td>
-                                    <td class="form-group">
-                                        <input style="width:50px;" type="text" [(ngModel)]="daterange.startDay" (change)="updateMinutes()" class="form-control text-center" maxlength="2">
-                                    </td>
-                                    <td> </td>
-                                </tr>
-                                <tr class="text-center">
-                                    <td><a (click)="decrementStartYears()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
-                                    <td>&nbsp;</td>
-                                    <td><a (click)="decrementStartMonths()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
-                                    <td>&nbsp;</td>
-                                    <td><a (click)="decrementStartDays()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td> — </td>
-                    <td>
-                        <timepicker [(ngModel)]="daterange.startDate" (change)="changed()" hourStep="1" minuteStep="1" showMeridian="true"></timepicker>
-                    </td>
-                    <td>&nbsp;</td>
+                  <td><a (click)="incrementStartYears()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
+                  <td>&nbsp;</td>
+                  <td><a (click)="incrementStartMonths()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
+                  <td>&nbsp;</td>
+                  <td><a (click)="incrementStartDays()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
                 </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="col-sm-offset-6 col-md-6">
-        <table>
-            <tbody>
+                <tr>
+                  <td class="form-group">
+                    <input style="width:70px;" type="text" [(ngModel)]="daterange.startYear" (change)="updateHours()" class="form-control text-center" maxlength="4">
+                  </td>
+                  <td> </td>
+                  <td class="form-group">
+                    <input style="width:60px;" type="text" [(ngModel)]="daterange.startMonthString" (change)="updateMinutes()" class="form-control text-center" maxlength="3">
+                  </td>
+                  <td> </td>
+                  <td class="form-group">
+                    <input style="width:50px;" type="text" [(ngModel)]="daterange.startDay" (change)="updateMinutes()" class="form-control text-center" maxlength="2">
+                  </td>
+                  <td> </td>
+                </tr>
                 <tr class="text-center">
-                    <td>
-                        <span>End Date:&nbsp;</span>
-                    </td>
-                    <td>
-                        <table>
-                            <tbody>
-                                <tr class="text-center">
-                                    <td><a (click)="incrementEndYears()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
-                                    <td>&nbsp;</td>
-                                    <td><a (click)="incrementEndMonths()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
-                                    <td>&nbsp;</td>
-                                    <td><a (click)="incrementEndDays()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
-                                </tr>
-                                <tr>
-                                    <td class="form-group">
-                                        <input style="width:70px;" type="text" [(ngModel)]="daterange.endYear" (change)="updateHours()" class="form-control text-center" maxlength="4">
-                                    </td>
-                                    <td> </td>
-                                    <td class="form-group">
-                                        <input style="width:60px;" type="text" [(ngModel)]="daterange.endMonthString" (change)="updateMinutes()" class="form-control text-center" maxlength="3">
-                                    </td>
-                                    <td> </td>
-                                    <td class="form-group">
-                                        <input style="width:50px;" type="text" [(ngModel)]="daterange.endDay" (change)="updateMinutes()" class="form-control text-center" maxlength="2">
-                                    </td>
-                                    <td> </td>
-                                </tr>
-                                <tr class="text-center">
-                                    <td><a (click)="decrementEndYears()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
-                                    <td>&nbsp;</td>
-                                    <td><a (click)="decrementEndMonths()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
-                                    <td>&nbsp;</td>
-                                    <td><a (click)="decrementEndDays()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td> — </td>
-                    <td>
-                        <timepicker [(ngModel)]="daterange.endDate" (change)="changed()" hourStep="1" minuteStep="1" showMeridian="true"></timepicker>
-                    </td>
-                    <td>&nbsp;</td>
+                  <td><a (click)="decrementStartYears()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
+                  <td>&nbsp;</td>
+                  <td><a (click)="decrementStartMonths()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
+                  <td>&nbsp;</td>
+                  <td><a (click)="decrementStartDays()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
                 </tr>
-            </tbody>
-        </table>
-    </div>
+              </tbody>
+            </table>
+          </td>
+          <td> — </td>
+          <td>
+            <timepicker [(ngModel)]="daterange.startDate" (change)="changed()" hourStep="1" minuteStep="1" showMeridian="true"></timepicker>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-sm-offset-6 col-md-6">
+    <table>
+      <tbody>
+        <tr class="text-center">
+          <td>
+            <span>End Date:&nbsp;</span>
+          </td>
+          <td>
+            <table>
+              <tbody>
+                <tr class="text-center">
+                  <td><a (click)="incrementEndYears()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
+                  <td>&nbsp;</td>
+                  <td><a (click)="incrementEndMonths()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
+                  <td>&nbsp;</td>
+                  <td><a (click)="incrementEndDays()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-up"></span></a></td>
+                </tr>
+                <tr>
+                  <td class="form-group">
+                    <input style="width:70px;" type="text" [(ngModel)]="daterange.endYear" (change)="updateHours()" class="form-control text-center" maxlength="4">
+                  </td>
+                  <td> </td>
+                  <td class="form-group">
+                    <input style="width:60px;" type="text" [(ngModel)]="daterange.endMonthString" (change)="updateMinutes()" class="form-control text-center" maxlength="3">
+                  </td>
+                  <td> </td>
+                  <td class="form-group">
+                    <input style="width:50px;" type="text" [(ngModel)]="daterange.endDay" (change)="updateMinutes()" class="form-control text-center" maxlength="2">
+                  </td>
+                  <td> </td>
+                </tr>
+                <tr class="text-center">
+                  <td><a (click)="decrementEndYears()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
+                  <td>&nbsp;</td>
+                  <td><a (click)="decrementEndMonths()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
+                  <td>&nbsp;</td>
+                  <td><a (click)="decrementEndDays()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a></td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+          <td> — </td>
+          <td>
+            <timepicker [(ngModel)]="daterange.endDate" (change)="changed()" hourStep="1" minuteStep="1" showMeridian="true"></timepicker>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

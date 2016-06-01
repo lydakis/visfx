@@ -37,17 +37,17 @@ module.exports = {
    */
   resolve: {
 
-    /**
-     * An array of extensions that should be used to resolve modules.
-     *
-     * See: http://webpack.github.io/docs/configuration.html#resolve-extensions
-     */
-    extensions: ['', '.ts', '.js'],
+  /**
+   * An array of extensions that should be used to resolve modules.
+   *
+   * See: http://webpack.github.io/docs/configuration.html#resolve-extensions
+   */
+  extensions: ['', '.ts', '.js'],
 
-    /**
-     * Make sure root is src
-     */
-    root: helpers.root('src'),
+  /**
+   * Make sure root is src
+   */
+  root: helpers.root('src'),
 
   },
 
@@ -58,120 +58,120 @@ module.exports = {
    */
   module: {
 
-    /**
-     * An array of applied pre and post loaders.
-     *
-     * See: http://webpack.github.io/docs/configuration.html#module-preloaders-module-postloaders
-     */
-    preLoaders: [
-
-      /**
-       * Tslint loader support for *.ts files
-       *
-       * See: https://github.com/wbuchwalter/tslint-loader
-       */
-      {
-        test: /\.ts$/,
-        loader: 'tslint-loader',
-        exclude: [helpers.root('node_modules')]
-      },
-
-      /**
-       * Source map loader support for *.js files
-       * Extracts SourceMaps for source files that as added as sourceMappingURL comment.
-       *
-       * See: https://github.com/webpack/source-map-loader
-       */
-      {
-        test: /\.js$/,
-        loader: 'source-map-loader',
-        exclude: [
-        // these packages have problems with their sourcemaps
-        helpers.root('node_modules/rxjs'),
-        helpers.root('node_modules/@angular2-material'),
-        helpers.root('node_modules/@angular')
-      ]}
-
-    ],
+  /**
+   * An array of applied pre and post loaders.
+   *
+   * See: http://webpack.github.io/docs/configuration.html#module-preloaders-module-postloaders
+   */
+  preLoaders: [
 
     /**
-     * An array of automatically applied loaders.
+     * Tslint loader support for *.ts files
      *
-     * IMPORTANT: The loaders here are resolved relative to the resource which they are applied to.
-     * This means they are not resolved relative to the configuration file.
-     *
-     * See: http://webpack.github.io/docs/configuration.html#module-loaders
+     * See: https://github.com/wbuchwalter/tslint-loader
      */
-    loaders: [
-
-      /**
-       * Typescript loader support for .ts and Angular 2 async routes via .async.ts
-       *
-       * See: https://github.com/s-panferov/awesome-typescript-loader
-       */
-      {
-        test: /\.ts$/,
-        loader: 'awesome-typescript-loader',
-        query: {
-          compilerOptions: {
-
-            // Remove TypeScript helpers to be injected
-            // below by DefinePlugin
-            removeComments: true
-
-          }
-        },
-        exclude: [/\.e2e\.ts$/]
-      },
-
-      /**
-       * Json loader support for *.json files.
-       *
-       * See: https://github.com/webpack/json-loader
-       */
-      { test: /\.json$/, loader: 'json-loader', exclude: [helpers.root('src/index.html')] },
-
-      /**
-       * Raw loader support for *.css files
-       * Returns file content as string
-       *
-       * See: https://github.com/webpack/raw-loader
-       */
-      { test: /\.css$/, loader: 'raw-loader', exclude: [helpers.root('src/index.html')] },
-
-      /**
-       * Raw loader support for *.html
-       * Returns file content as string
-       *
-       * See: https://github.com/webpack/raw-loader
-       */
-      { test: /\.html$/, loader: 'raw-loader', exclude: [helpers.root('src/index.html')] }
-
-    ],
+    {
+    test: /\.ts$/,
+    loader: 'tslint-loader',
+    exclude: [helpers.root('node_modules')]
+    },
 
     /**
-     * An array of applied pre and post loaders.
+     * Source map loader support for *.js files
+     * Extracts SourceMaps for source files that as added as sourceMappingURL comment.
      *
-     * See: http://webpack.github.io/docs/configuration.html#module-preloaders-module-postloaders
+     * See: https://github.com/webpack/source-map-loader
      */
-    postLoaders: [
+    {
+    test: /\.js$/,
+    loader: 'source-map-loader',
+    exclude: [
+    // these packages have problems with their sourcemaps
+    helpers.root('node_modules/rxjs'),
+    helpers.root('node_modules/@angular2-material'),
+    helpers.root('node_modules/@angular')
+    ]}
 
-      /**
-       * Instruments JS files with Istanbul for subsequent code coverage reporting.
-       * Instrument only testing sources.
-       *
-       * See: https://github.com/deepsweet/istanbul-instrumenter-loader
-       */
-      {
-        test: /\.(js|ts)$/, loader: 'istanbul-instrumenter-loader',
-        include: helpers.root('src'),
-        exclude: [
-          /\.(e2e|spec)\.ts$/,
-          /node_modules/
-        ]
+  ],
+
+  /**
+   * An array of automatically applied loaders.
+   *
+   * IMPORTANT: The loaders here are resolved relative to the resource which they are applied to.
+   * This means they are not resolved relative to the configuration file.
+   *
+   * See: http://webpack.github.io/docs/configuration.html#module-loaders
+   */
+  loaders: [
+
+    /**
+     * Typescript loader support for .ts and Angular 2 async routes via .async.ts
+     *
+     * See: https://github.com/s-panferov/awesome-typescript-loader
+     */
+    {
+    test: /\.ts$/,
+    loader: 'awesome-typescript-loader',
+    query: {
+      compilerOptions: {
+
+      // Remove TypeScript helpers to be injected
+      // below by DefinePlugin
+      removeComments: true
+
       }
+    },
+    exclude: [/\.e2e\.ts$/]
+    },
 
+    /**
+     * Json loader support for *.json files.
+     *
+     * See: https://github.com/webpack/json-loader
+     */
+    { test: /\.json$/, loader: 'json-loader', exclude: [helpers.root('src/index.html')] },
+
+    /**
+     * Raw loader support for *.css files
+     * Returns file content as string
+     *
+     * See: https://github.com/webpack/raw-loader
+     */
+    { test: /\.css$/, loader: 'raw-loader', exclude: [helpers.root('src/index.html')] },
+
+    /**
+     * Raw loader support for *.html
+     * Returns file content as string
+     *
+     * See: https://github.com/webpack/raw-loader
+     */
+    { test: /\.html$/, loader: 'raw-loader', exclude: [helpers.root('src/index.html')] }
+
+  ],
+
+  /**
+   * An array of applied pre and post loaders.
+   *
+   * See: http://webpack.github.io/docs/configuration.html#module-preloaders-module-postloaders
+   */
+  postLoaders: [
+
+    /**
+     * Instruments JS files with Istanbul for subsequent code coverage reporting.
+     * Instrument only testing sources.
+     *
+     * See: https://github.com/deepsweet/istanbul-instrumenter-loader
+     */
+    {
+    test: /\.(js|ts)$/, loader: 'istanbul-instrumenter-loader',
+    include: helpers.root('src'),
+    exclude: [
+      /\.(e2e|spec)\.ts$/,
+      /node_modules/
     ]
+    }
+
+  ]
   },
 
   /**
@@ -181,25 +181,25 @@ module.exports = {
    */
   plugins: [
 
-    /**
-     * Plugin: DefinePlugin
-     * Description: Define free variables.
-     * Useful for having development builds with debug logging or adding global constants.
-     *
-     * Environment helpers
-     *
-     * See: https://webpack.github.io/docs/list-of-plugins.html#defineplugin
-     */
-    // NOTE: when adding more properties make sure you include them in custom-typings.d.ts
-    new DefinePlugin({
-      'ENV': JSON.stringify(ENV),
-      'HMR': false,
-      'process.env': {
-        'ENV': JSON.stringify(ENV),
-        'NODE_ENV': JSON.stringify(ENV),
-        'HMR': false,
-      }
-    }),
+  /**
+   * Plugin: DefinePlugin
+   * Description: Define free variables.
+   * Useful for having development builds with debug logging or adding global constants.
+   *
+   * Environment helpers
+   *
+   * See: https://webpack.github.io/docs/list-of-plugins.html#defineplugin
+   */
+  // NOTE: when adding more properties make sure you include them in custom-typings.d.ts
+  new DefinePlugin({
+    'ENV': JSON.stringify(ENV),
+    'HMR': false,
+    'process.env': {
+    'ENV': JSON.stringify(ENV),
+    'NODE_ENV': JSON.stringify(ENV),
+    'HMR': false,
+    }
+  }),
 
 
   ],
@@ -211,9 +211,9 @@ module.exports = {
    * See: https://github.com/wbuchwalter/tslint-loader
    */
   tslint: {
-    emitErrors: false,
-    failOnHint: false,
-    resourcePath: 'src'
+  emitErrors: false,
+  failOnHint: false,
+  resourcePath: 'src'
   },
 
   /**
@@ -223,12 +223,12 @@ module.exports = {
    * See: https://webpack.github.io/docs/configuration.html#node
    */
   node: {
-    global: 'window',
-    process: false,
-    crypto: 'empty',
-    module: false,
-    clearImmediate: false,
-    setImmediate: false
+  global: 'window',
+  process: false,
+  crypto: 'empty',
+  module: false,
+  clearImmediate: false,
+  setImmediate: false
   }
 
 };

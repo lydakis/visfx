@@ -9,157 +9,156 @@ import {TimeResolution} from './time-resolution'
 
 @Injectable()
 export class ElasticsearchService {
-    private _esUrl = 'http://83.212.100.48:9200';
-    private _index = 'forex';
+  private _esUrl = 'http://83.212.100.48:9200';
+  private _index = 'forex';
 
-    constructor(private http: Http) { }
+  constructor(private http: Http) { }
 
-    getHealthString() {
-        let healthUrl = '/_cat/health';
+  getHealthString() {
+    let healthUrl = '/_cat/health';
 
-        return this.http.get(this._esUrl + healthUrl)
-            .map(res => <string>res.text())
-            .do(data => console.log(data))
-            .catch(this.handleError);
+    return this.http.get(this._esUrl + healthUrl)
+      .map(res => <string>res.text())
+      .do(data => console.log(data))
+      .catch(this.handleError);
+  }
+
+  getDocument(id: number, index: string, type: string) {
+    let documentUrl = '/' + index + '/' + type + '/' + id;
+
+    return this.http.get(this._esUrl + documentUrl)
+      .map(res => this.processGeneralResponse(res.json()))
+      .do(data => console.log(data))
+      .catch(this.handleError);
+  }
+
+  search(
+    query: Object, index: string, type: string,
+    processResponse: (res: ElasticsearchResponse) => Object[]) {
+    let searchUrl = '/' + index + '/' + type + '/_search'
+    let body = JSON.stringify(query);
+
+    return this.http.post(this._esUrl + searchUrl, body)
+      .map(res => processResponse(res.json()))
+      .do(data => console.log(data))
+      .catch(this.handleError);
+  }
+
+  getHistory(
+    currencyPair: string,
+    startDate: string, endDate: string, resolution: string) {
+    let type = 'history';
+    let query = {
+      "size": 10000,
+      "query": {
+        "match": {
+          "currency_pair": currencyPair
+        }
+      },
+      "filter": {
+        "range": {
+          "tick_date": {
+            "gte": startDate,
+            "lte": endDate,
+            "format": "strict_date_time"
+          }
+        }
+      }
     }
 
-    getDocument(id: number, index: string, type: string) {
-        let documentUrl = '/' + index + '/' + type + '/' + id;
-
-        return this.http.get(this._esUrl + documentUrl)
-            .map(res => this.processGeneralResponse(res.json()))
-            .do(data => console.log(data))
-            .catch(this.handleError);
-    }
-
-    search(
-        query: Object, index: string, type: string,
-        processResponse: (res: ElasticsearchResponse) => Object[]) {
-        let searchUrl = '/' + index + '/' + type + '/_search'
-        let body = JSON.stringify(query);
-
-        return this.http.post(this._esUrl + searchUrl, body)
-            .map(res => processResponse(res.json()))
-            .do(data => console.log(data))
-            .catch(this.handleError);
-    }
-
-    getHistory(
-        currencyPair: string,
-        startDate: string, endDate: string,
-        resolution: string) {
-        let type = 'history';
-        let query = {
-            "size": 10000,
-            "query": {
-                "match": {
-                    "currency_pair": currencyPair
+    if (TimeResolution.T !== resolution) {
+      query["size"] = 1;
+      query["aggs"] = {
+        "range": {
+          "date_range": {
+            "field": "tick_date",
+            "format": "strict_date_time",
+            "ranges": [
+              { "from": startDate, "to": endDate },
+            ]
+          },
+          "aggs": {
+            "resolution": {
+              "date_histogram": {
+                "field": "tick_date",
+                "interval": resolution
+              },
+              "aggs": {
+                "avg_bid": {
+                  "avg": {
+                    "field": "bid_price"
+                  }
+                },
+                "avg_ask": {
+                  "avg": {
+                    "field": "ask_price"
+                  }
                 }
-            },
-            "filter": {
-                "range": {
-                    "tick_date": {
-                        "gte": startDate,
-                        "lte": endDate,
-                        "format": "strict_date_time"
-                    }
-                }
+              }
             }
+          }
         }
-
-        if (TimeResolution.T !== resolution) {
-            query["size"] = 1;
-            query["aggs"] = {
-                "range": {
-                    "date_range": {
-                        "field": "tick_date",
-                        "format": "strict_date_time",
-                        "ranges": [
-                            { "from": startDate, "to": endDate },
-                        ]
-                    },
-                    "aggs": {
-                        "resolution": {
-                            "date_histogram": {
-                                "field": "tick_date",
-                                "interval": resolution
-                            },
-                            "aggs": {
-                                "avg_bid": {
-                                    "avg": {
-                                        "field": "bid_price"
-                                    }
-                                },
-                                "avg_ask": {
-                                    "avg": {
-                                        "field": "ask_price"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        console.log(query);
-
-        return this.search(
-            query, this._index, 'history', this.processHistoryResponseForCharts);
+      }
     }
 
-    private processGeneralResponse(res: ElasticsearchResponse) {
-        let result = [];
+    console.log(query);
 
-        for (let i = 0; i < res.hits.hits.length; i++) {
-            result.push(res.hits.hits[i]._source);
-        }
+    return this.search(
+      query, this._index, 'history', this.processHistoryResponseForCharts);
+  }
 
-        return result;
+  private processGeneralResponse(res: ElasticsearchResponse) {
+    let result = [];
+
+    for (let i = 0; i < res.hits.hits.length; i++) {
+      result.push(res.hits.hits[i]._source);
     }
 
-    private processHistoryResponseForCharts(res: ElasticsearchResponse) {
-        console.log(res);
-        let results = res.hits.hits;
-        let series = [
-            {
-                name: (<History>results[0]._source).currency_pair + ' Ask',
-                data: []
-            },
-            {
-                name: (<History>results[0]._source).currency_pair + ' Bid',
-                data: []
-            }
-        ];
+    return result;
+  }
 
-        if (undefined === res.aggregations) {
-            for (let i = 0; i < results.length; i++) {
-                let date = Date.parse(
-                    (<History>results[i]._source).tick_date.toString());
+  private processHistoryResponseForCharts(res: ElasticsearchResponse) {
+    console.log(res);
+    let results = res.hits.hits;
+    let series = [
+      {
+        name: (<History>results[0]._source).currency_pair + ' Ask',
+        data: []
+      },
+      {
+        name: (<History>results[0]._source).currency_pair + ' Bid',
+        data: []
+      }
+    ];
 
-                series[0].data[i] = [
-                    date, (<History>results[i]._source).ask_price];
-                series[1].data[i] = [
-                    date, (<History>results[i]._source).bid_price];
-            }
-        }
-        else {
-            let aggs = res.aggregations.range.buckets[0].resolution.buckets;
+    if (undefined === res.aggregations) {
+      for (let i = 0; i < results.length; i++) {
+        let date = Date.parse(
+          (<History>results[i]._source).tick_date.toString());
 
-            for (let i = 0; i < aggs.length; i++) {
-                series[0].data[i] = [aggs[i].key, aggs[i].avg_ask.value];
-                series[1].data[i] = [aggs[i].key, aggs[i].avg_bid.value];
-            }
-        }
+        series[0].data[i] = [
+          date, (<History>results[i]._source).ask_price];
+        series[1].data[i] = [
+          date, (<History>results[i]._source).bid_price];
+      }
+    }
+    else {
+      let aggs = res.aggregations.range.buckets[0].resolution.buckets;
 
-        series[0].data = series[0].data.sort((a, b) => a[0] - b[0]);
-        series[1].data = series[1].data.sort((a, b) => a[0] - b[0]);
-
-        return series;
+      for (let i = 0; i < aggs.length; i++) {
+        series[0].data[i] = [aggs[i].key, aggs[i].avg_ask.value];
+        series[1].data[i] = [aggs[i].key, aggs[i].avg_bid.value];
+      }
     }
 
-    private handleError(error: Response) {
-        console.error(error);
-        return Observable.throw(error.json().error || 'Server Error');
-    }
+    series[0].data = series[0].data.sort((a, b) => a[0] - b[0]);
+    series[1].data = series[1].data.sort((a, b) => a[0] - b[0]);
+
+    return series;
+  }
+
+  private handleError(error: Response) {
+    console.error(error);
+    return Observable.throw(error.json().error || 'Server Error');
+  }
 }

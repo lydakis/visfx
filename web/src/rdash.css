@@ -6,12 +6,12 @@
 }
 @media only screen and (min-width: 561px) {
   #page-wrapper.open {
-    padding-left: 250px;
+  padding-left: 250px;
   }
 }
 @media only screen and (max-width: 560px) {
   #page-wrapper.open {
-    padding-left: 70px;
+  padding-left: 70px;
   }
 }
 #page-wrapper.open #sidebar-wrapper {
@@ -26,28 +26,28 @@
  */
 @media only screen and (max-width: 560px) {
   body.hamburg #page-wrapper {
-    padding-left: 0;
+  padding-left: 0;
   }
   body.hamburg #page-wrapper:not(.open) #sidebar-wrapper {
-    position: absolute;
-    left: -100px;
+  position: absolute;
+  left: -100px;
   }
   body.hamburg #page-wrapper:not(.open) ul.sidebar .sidebar-title.separator {
-    display: none;
+  display: none;
   }
   body.hamburg #page-wrapper.open #sidebar-wrapper {
-    position: fixed;
+  position: fixed;
   }
   body.hamburg #page-wrapper.open #sidebar-wrapper ul.sidebar li.sidebar-main {
-    margin-left: 0px;
+  margin-left: 0px;
   }
   body.hamburg #sidebar-wrapper ul.sidebar li.sidebar-main,
   body.hamburg .row.header .meta {
-    margin-left: 70px;
+  margin-left: 70px;
   }
   body.hamburg #sidebar-wrapper ul.sidebar li.sidebar-main,
   body.hamburg #page-wrapper.open #sidebar-wrapper ul.sidebar li.sidebar-main {
-    transition: margin-left 0.4s ease 0s;
+  transition: margin-left 0.4s ease 0s;
   }
 }
 
@@ -165,21 +165,21 @@
 @-webkit-keyframes bounce {
   0%,
   100% {
-    -webkit-transform: scale(0);
+  -webkit-transform: scale(0);
   }
   50% {
-    -webkit-transform: scale(1);
+  -webkit-transform: scale(1);
   }
 }
 @keyframes bounce {
   0%,
   100% {
-    transform: scale(0);
-    -webkit-transform: scale(0);
+  transform: scale(0);
+  -webkit-transform: scale(0);
   }
   50% {
-    transform: scale(1);
-    -webkit-transform: scale(1);
+  transform: scale(1);
+  -webkit-transform: scale(1);
   }
 }
 
@@ -193,11 +193,11 @@
 }
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
   @font-face {
-    font-family: 'Montserrat';
-    src: url('../fonts/montserrat-regular-webfont.svg') format('svg');
+  font-family: 'Montserrat';
+  src: url('../fonts/montserrat-regular-webfont.svg') format('svg');
   }
   select {
-    font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   }
 }
 /* Base */

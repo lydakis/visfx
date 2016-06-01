@@ -59,59 +59,59 @@ module.exports = webpackMerge(commonConfig, {
    */
   output: {
 
-    /**
-     * The output directory as absolute path (required).
-     *
-     * See: http://webpack.github.io/docs/configuration.html#output-path
-     */
-    path: helpers.root('dist'),
+  /**
+   * The output directory as absolute path (required).
+   *
+   * See: http://webpack.github.io/docs/configuration.html#output-path
+   */
+  path: helpers.root('dist'),
 
-    /**
-     * Specifies the name of each output file on disk.
-     * IMPORTANT: You must not specify an absolute path here!
-     *
-     * See: http://webpack.github.io/docs/configuration.html#output-filename
-     */
-    filename: '[name].bundle.js',
+  /**
+   * Specifies the name of each output file on disk.
+   * IMPORTANT: You must not specify an absolute path here!
+   *
+   * See: http://webpack.github.io/docs/configuration.html#output-filename
+   */
+  filename: '[name].bundle.js',
 
-    /**
-     * The filename of the SourceMaps for the JavaScript files.
-     * They are inside the output.path directory.
-     *
-     * See: http://webpack.github.io/docs/configuration.html#output-sourcemapfilename
-     */
-    sourceMapFilename: '[name].map',
+  /**
+   * The filename of the SourceMaps for the JavaScript files.
+   * They are inside the output.path directory.
+   *
+   * See: http://webpack.github.io/docs/configuration.html#output-sourcemapfilename
+   */
+  sourceMapFilename: '[name].map',
 
-    /** The filename of non-entry chunks as relative path
-     * inside the output.path directory.
-     *
-     * See: http://webpack.github.io/docs/configuration.html#output-chunkfilename
-     */
-    chunkFilename: '[id].chunk.js'
+  /** The filename of non-entry chunks as relative path
+   * inside the output.path directory.
+   *
+   * See: http://webpack.github.io/docs/configuration.html#output-chunkfilename
+   */
+  chunkFilename: '[id].chunk.js'
 
   },
 
   plugins: [
 
-    /**
-     * Plugin: DefinePlugin
-     * Description: Define free variables.
-     * Useful for having development builds with debug logging or adding global constants.
-     *
-     * Environment helpers
-     *
-     * See: https://webpack.github.io/docs/list-of-plugins.html#defineplugin
-     */
-    // NOTE: when adding more properties, make sure you include them in custom-typings.d.ts
-    new DefinePlugin({
-      'ENV': JSON.stringify(METADATA.ENV),
-      'HMR': METADATA.HMR,
-      'process.env': {
-        'ENV': JSON.stringify(METADATA.ENV),
-        'NODE_ENV': JSON.stringify(METADATA.ENV),
-        'HMR': METADATA.HMR,
-      }
-    })
+  /**
+   * Plugin: DefinePlugin
+   * Description: Define free variables.
+   * Useful for having development builds with debug logging or adding global constants.
+   *
+   * Environment helpers
+   *
+   * See: https://webpack.github.io/docs/list-of-plugins.html#defineplugin
+   */
+  // NOTE: when adding more properties, make sure you include them in custom-typings.d.ts
+  new DefinePlugin({
+    'ENV': JSON.stringify(METADATA.ENV),
+    'HMR': METADATA.HMR,
+    'process.env': {
+    'ENV': JSON.stringify(METADATA.ENV),
+    'NODE_ENV': JSON.stringify(METADATA.ENV),
+    'HMR': METADATA.HMR,
+    }
+  })
   ],
 
   /**
@@ -121,9 +121,9 @@ module.exports = webpackMerge(commonConfig, {
    * See: https://github.com/wbuchwalter/tslint-loader
    */
   tslint: {
-    emitErrors: false,
-    failOnHint: false,
-    resourcePath: 'src'
+  emitErrors: false,
+  failOnHint: false,
+  resourcePath: 'src'
   },
 
   /**
@@ -135,14 +135,14 @@ module.exports = webpackMerge(commonConfig, {
    * See: https://webpack.github.io/docs/webpack-dev-server.html
    */
   devServer: {
-    port: METADATA.port,
-    host: METADATA.host,
-    historyApiFallback: true,
-    watchOptions: {
-      aggregateTimeout: 300,
-      poll: 1000
-    },
-    outputPath: helpers.root('dist')
+  port: METADATA.port,
+  host: METADATA.host,
+  historyApiFallback: true,
+  watchOptions: {
+    aggregateTimeout: 300,
+    poll: 1000
+  },
+  outputPath: helpers.root('dist')
   },
 
   /*
@@ -152,12 +152,12 @@ module.exports = webpackMerge(commonConfig, {
    * See: https://webpack.github.io/docs/configuration.html#node
    */
   node: {
-    global: 'window',
-    crypto: 'empty',
-    process: true,
-    module: false,
-    clearImmediate: false,
-    setImmediate: false
+  global: 'window',
+  crypto: 'empty',
+  process: true,
+  module: false,
+  clearImmediate: false,
+  setImmediate: false
   }
 
 });

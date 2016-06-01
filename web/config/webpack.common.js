@@ -50,9 +50,9 @@ module.exports = {
    */
   entry: {
 
-    'polyfills': './src/polyfills.ts',
-    'vendor': './src/vendor.ts',
-    'main': './src/app/main.ts'
+  'polyfills': './src/polyfills.ts',
+  'vendor': './src/vendor.ts',
+  'main': './src/app/main.ts'
 
   },
 
@@ -63,28 +63,28 @@ module.exports = {
    */
   resolve: {
 
-    /*
-     * An array of extensions that should be used to resolve modules.
-     *
-     * See: http://webpack.github.io/docs/configuration.html#resolve-extensions
-     */
-    extensions: ['', '.ts', '.js'],
+  /*
+   * An array of extensions that should be used to resolve modules.
+   *
+   * See: http://webpack.github.io/docs/configuration.html#resolve-extensions
+   */
+  extensions: ['', '.ts', '.js'],
 
-    // Make sure root is src
-    root: helpers.root('src'),
+  // Make sure root is src
+  root: helpers.root('src'),
 
-    // remove other default values
-    modulesDirectories: ['node_modules'],
+  // remove other default values
+  modulesDirectories: ['node_modules'],
 
-    alias: {
-      'angular2/core': helpers.root('node_modules/@angular/core/index.js'),
-      'angular2/testing': helpers.root('node_modules/@angular/core/testing.js'),
-      '@angular/testing': helpers.root('node_modules/@angular/core/testing.js'),
-      'angular2/platform/browser': helpers.root('node_modules/@angular/platform-browser/index.js'),
-      'angular2/router': helpers.root('node_modules/@angular/router-deprecated/index.js'),
-      'angular2/http': helpers.root('node_modules/@angular/http/index.js'),
-      'angular2/http/testing': helpers.root('node_modules/@angular/http/testing.js')
-    },
+  alias: {
+    'angular2/core': helpers.root('node_modules/@angular/core/index.js'),
+    'angular2/testing': helpers.root('node_modules/@angular/core/testing.js'),
+    '@angular/testing': helpers.root('node_modules/@angular/core/testing.js'),
+    'angular2/platform/browser': helpers.root('node_modules/@angular/platform-browser/index.js'),
+    'angular2/router': helpers.root('node_modules/@angular/router-deprecated/index.js'),
+    'angular2/http': helpers.root('node_modules/@angular/http/index.js'),
+    'angular2/http/testing': helpers.root('node_modules/@angular/http/testing.js')
+  },
 
   },
 
@@ -95,93 +95,93 @@ module.exports = {
    */
   module: {
 
-    /*
-     * An array of applied pre and post loaders.
-     *
-     * See: http://webpack.github.io/docs/configuration.html#module-preloaders-module-postloaders
-     */
-    preLoaders: [
-
-      /*
-       * Tslint loader support for *.ts files
-       *
-       * See: https://github.com/wbuchwalter/tslint-loader
-       */
-       // { test: /\.ts$/, loader: 'tslint-loader', exclude: [ helpers.root('node_modules') ] },
-
-      /*
-       * Source map loader support for *.js files
-       * Extracts SourceMaps for source files that as added as sourceMappingURL comment.
-       *
-       * See: https://github.com/webpack/source-map-loader
-       */
-      {
-        test: /\.js$/,
-        loader: 'source-map-loader',
-        exclude: [
-          // these packages have problems with their sourcemaps
-          helpers.root('node_modules/rxjs'),
-          helpers.root('node_modules/@angular2-material'),
-          helpers.root('node_modules/@angular'),
-        ]
-      }
-
-    ],
+  /*
+   * An array of applied pre and post loaders.
+   *
+   * See: http://webpack.github.io/docs/configuration.html#module-preloaders-module-postloaders
+   */
+  preLoaders: [
 
     /*
-     * An array of automatically applied loaders.
+     * Tslint loader support for *.ts files
      *
-     * IMPORTANT: The loaders here are resolved relative to the resource which they are applied to.
-     * This means they are not resolved relative to the configuration file.
-     *
-     * See: http://webpack.github.io/docs/configuration.html#module-loaders
+     * See: https://github.com/wbuchwalter/tslint-loader
      */
-    loaders: [
+     // { test: /\.ts$/, loader: 'tslint-loader', exclude: [ helpers.root('node_modules') ] },
 
-      /*
-       * Typescript loader support for .ts and Angular 2 async routes via .async.ts
-       *
-       * See: https://github.com/s-panferov/awesome-typescript-loader
-       */
-      {
-        test: /\.ts$/,
-        loader: 'awesome-typescript-loader',
-        exclude: [/\.(spec|e2e)\.ts$/]
-      },
-
-      /*
-       * Json loader support for *.json files.
-       *
-       * See: https://github.com/webpack/json-loader
-       */
-      {
-        test: /\.json$/,
-        loader: 'json-loader'
-      },
-
-      /*
-       * Raw loader support for *.css files
-       * Returns file content as string
-       *
-       * See: https://github.com/webpack/raw-loader
-       */
-      {
-        test: /\.css$/,
-        loader: 'raw-loader'
-      },
-
-      /* Raw loader support for *.html
-       * Returns file content as string
-       *
-       * See: https://github.com/webpack/raw-loader
-       */
-      {
-        test: /\.html$/,
-        loader: 'raw-loader',
-        exclude: [helpers.root('src/index.html')]
-      }
-
+    /*
+     * Source map loader support for *.js files
+     * Extracts SourceMaps for source files that as added as sourceMappingURL comment.
+     *
+     * See: https://github.com/webpack/source-map-loader
+     */
+    {
+    test: /\.js$/,
+    loader: 'source-map-loader',
+    exclude: [
+      // these packages have problems with their sourcemaps
+      helpers.root('node_modules/rxjs'),
+      helpers.root('node_modules/@angular2-material'),
+      helpers.root('node_modules/@angular'),
     ]
+    }
+
+  ],
+
+  /*
+   * An array of automatically applied loaders.
+   *
+   * IMPORTANT: The loaders here are resolved relative to the resource which they are applied to.
+   * This means they are not resolved relative to the configuration file.
+   *
+   * See: http://webpack.github.io/docs/configuration.html#module-loaders
+   */
+  loaders: [
+
+    /*
+     * Typescript loader support for .ts and Angular 2 async routes via .async.ts
+     *
+     * See: https://github.com/s-panferov/awesome-typescript-loader
+     */
+    {
+    test: /\.ts$/,
+    loader: 'awesome-typescript-loader',
+    exclude: [/\.(spec|e2e)\.ts$/]
+    },
+
+    /*
+     * Json loader support for *.json files.
+     *
+     * See: https://github.com/webpack/json-loader
+     */
+    {
+    test: /\.json$/,
+    loader: 'json-loader'
+    },
+
+    /*
+     * Raw loader support for *.css files
+     * Returns file content as string
+     *
+     * See: https://github.com/webpack/raw-loader
+     */
+    {
+    test: /\.css$/,
+    loader: 'raw-loader'
+    },
+
+    /* Raw loader support for *.html
+     * Returns file content as string
+     *
+     * See: https://github.com/webpack/raw-loader
+     */
+    {
+    test: /\.html$/,
+    loader: 'raw-loader',
+    exclude: [helpers.root('src/index.html')]
+    }
+
+  ]
 
   },
 
@@ -192,61 +192,61 @@ module.exports = {
    */
   plugins: [
 
-    /*
-     * Plugin: ForkCheckerPlugin
-     * Description: Do type checking in a separate process, so webpack don't need to wait.
-     *
-     * See: https://github.com/s-panferov/awesome-typescript-loader#forkchecker-boolean-defaultfalse
-     */
-    new ForkCheckerPlugin(),
+  /*
+   * Plugin: ForkCheckerPlugin
+   * Description: Do type checking in a separate process, so webpack don't need to wait.
+   *
+   * See: https://github.com/s-panferov/awesome-typescript-loader#forkchecker-boolean-defaultfalse
+   */
+  new ForkCheckerPlugin(),
 
-    /*
-     * Plugin: OccurenceOrderPlugin
-     * Description: Varies the distribution of the ids to get the smallest id length
-     * for often used ids.
-     *
-     * See: https://webpack.github.io/docs/list-of-plugins.html#occurrenceorderplugin
-     * See: https://github.com/webpack/docs/wiki/optimization#minimize
-     */
-    new webpack.optimize.OccurenceOrderPlugin(true),
+  /*
+   * Plugin: OccurenceOrderPlugin
+   * Description: Varies the distribution of the ids to get the smallest id length
+   * for often used ids.
+   *
+   * See: https://webpack.github.io/docs/list-of-plugins.html#occurrenceorderplugin
+   * See: https://github.com/webpack/docs/wiki/optimization#minimize
+   */
+  new webpack.optimize.OccurenceOrderPlugin(true),
 
-    /*
-     * Plugin: CommonsChunkPlugin
-     * Description: Shares common code between the pages.
-     * It identifies common modules and put them into a commons chunk.
-     *
-     * See: https://webpack.github.io/docs/list-of-plugins.html#commonschunkplugin
-     * See: https://github.com/webpack/docs/wiki/optimization#multi-page-app
-     */
-    new webpack.optimize.CommonsChunkPlugin({
-      name: ['polyfills', 'vendor'].reverse()
-    }),
+  /*
+   * Plugin: CommonsChunkPlugin
+   * Description: Shares common code between the pages.
+   * It identifies common modules and put them into a commons chunk.
+   *
+   * See: https://webpack.github.io/docs/list-of-plugins.html#commonschunkplugin
+   * See: https://github.com/webpack/docs/wiki/optimization#multi-page-app
+   */
+  new webpack.optimize.CommonsChunkPlugin({
+    name: ['polyfills', 'vendor'].reverse()
+  }),
 
-    /*
-     * Plugin: CopyWebpackPlugin
-     * Description: Copy files and directories in webpack.
-     *
-     * Copies project static assets.
-     *
-     * See: https://www.npmjs.com/package/copy-webpack-plugin
-     */
-    new CopyWebpackPlugin([{
-      from: 'src/assets',
-      to: 'assets'
-    }]),
+  /*
+   * Plugin: CopyWebpackPlugin
+   * Description: Copy files and directories in webpack.
+   *
+   * Copies project static assets.
+   *
+   * See: https://www.npmjs.com/package/copy-webpack-plugin
+   */
+  new CopyWebpackPlugin([{
+    from: 'src/assets',
+    to: 'assets'
+  }]),
 
-    /*
-     * Plugin: HtmlWebpackPlugin
-     * Description: Simplifies creation of HTML files to serve your webpack bundles.
-     * This is especially useful for webpack bundles that include a hash in the filename
-     * which changes every compilation.
-     *
-     * See: https://github.com/ampedandwired/html-webpack-plugin
-     */
-    new HtmlWebpackPlugin({
-      template: 'src/index.html',
-      chunksSortMode: 'dependency'
-    })
+  /*
+   * Plugin: HtmlWebpackPlugin
+   * Description: Simplifies creation of HTML files to serve your webpack bundles.
+   * This is especially useful for webpack bundles that include a hash in the filename
+   * which changes every compilation.
+   *
+   * See: https://github.com/ampedandwired/html-webpack-plugin
+   */
+  new HtmlWebpackPlugin({
+    template: 'src/index.html',
+    chunksSortMode: 'dependency'
+  })
 
   ],
 
@@ -257,11 +257,11 @@ module.exports = {
    * See: https://webpack.github.io/docs/configuration.html#node
    */
   node: {
-    global: 'window',
-    crypto: 'empty',
-    module: false,
-    clearImmediate: false,
-    setImmediate: false
+  global: 'window',
+  crypto: 'empty',
+  module: false,
+  clearImmediate: false,
+  setImmediate: false
   }
 
 };

@@ -1,14 +1,14 @@
 <div class="row">
-    <div class="col-md-12">
-        <date-picker [(ngModel)]="date"></date-picker>
-    </div>
+  <div class="col-md-12">
+    <date-picker [(ngModel)]="date"></date-picker>
+  </div>
 </div>
 <div class="row">
-    <div class="col-md-6">
-        <showcase [daterange]="date"></showcase>
-    </div>
+  <div class="col-md-6">
+    <showcase [daterange]="date"></showcase>
+  </div>
 </div>
 <div class="row">
-    <div class="col-md-6"><line-chart [series]="data" [title]="title"></line-chart></div>
-    <div class="col-md-6"><stock-chart [series]="data" [title]="title"></stock-chart></div>
+  <div class="col-md-6"><line-chart [series]="data" [title]="title"></line-chart></div>
+  <div class="col-md-6"><stock-chart [series]="data" [title]="title"></stock-chart></div>
 </div>

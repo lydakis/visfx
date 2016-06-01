@@ -1,18 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "sourceMap": true,
-    "noEmitHelpers": true
+  "target": "es5",
+  "module": "commonjs",
+  "emitDecoratorMetadata": true,
+  "experimentalDecorators": true,
+  "sourceMap": true,
+  "noEmitHelpers": true
   },
   "exclude": [
-    "node_modules"
+  "node_modules"
   ],
   "awesomeTypescriptLoaderOptions": {
-    "resolveGlobs": true,
-    "forkChecker": true
+  "resolveGlobs": true,
+  "forkChecker": true
   },
   "compileOnSave": false,
   "buildOnSave": false,
