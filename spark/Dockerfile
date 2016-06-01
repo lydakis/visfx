@@ -1,8 +1,6 @@
-FROM elasticsearch:latest
+FROM ubuntu:latest
 
-COPY config/elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
-
-RUN apt-get update -qq && apt-get install -y python-dev python-pip wget
+RUN apt-get update -qq && apt-get install -y python-dev python-pip wget default-jdk
 RUN pip install --upgrade pip
 RUN pip install numpy
 RUN pip install pandas
@@ -15,4 +13,6 @@ ENV SPARK_HOME /usr/local/spark
 
 ENV PATH $PATH:$SPARK_HOME/bin
 
+RUN mkdir /recommendations
 COPY elasticsearch-hadoop-2.3.2.jar .
+COPY recommendations/ /recommendations/
