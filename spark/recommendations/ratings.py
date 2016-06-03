@@ -79,6 +79,6 @@ if __name__ == '__main__':
     conf = SparkConf().setAppName('Compute Currency Ratings')
     sc = SparkContext(conf=conf)
 
-    es_rdd = get_es_rdd('forex/transaction')
+    es_rdd = get_es_rdd(sc, 'forex/transaction')
     ratings = get_ratings(es_rdd, '2015-05-01', '1y')
     save_ratings(ratings, 'forex/rating', 'rating_id')

@@ -15,7 +15,7 @@ def es_write_conf(index, key=None):
         conf['es.mapping.id'] = key
     return conf
 
-def get_es_rdd(index):
+def get_es_rdd(sc, index):
     return sc.newAPIHadoopRDD(
         inputFormatClass='org.elasticsearch.hadoop.mr.EsInputFormat',
         keyClass='org.apache.hadoop.io.NullWritable',
