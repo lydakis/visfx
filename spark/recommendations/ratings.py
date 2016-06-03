@@ -52,7 +52,7 @@ def count_pairs(rdd, provider):
                 'currency_pair': item[0],
                 'count': item[1]
             }
-        )).cache()
+        ))
     return pair_counts
 
 def calc_rating(rdd):
