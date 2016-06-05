@@ -1,13 +1,13 @@
 def es_read_conf(index):
      return {
-        'es.nodes': '83.212.100.48',
+        'es.nodes': 'search',
         'es.port': '9200',
         'es.resource': index
     }
 
 def es_write_conf(index, key=None):
     conf = {
-        'es.nodes': '83.212.100.48',
+        'es.nodes': 'search',
         'es.port': '9200',
         'es.resource': index
     }
