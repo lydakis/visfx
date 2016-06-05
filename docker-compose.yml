@@ -10,6 +10,12 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
+  spark:
+    build: ./spark
+    command: -d
+    ports:
+      - 8088:8088
+      - 8042:8042
   logstash:
     image: logstash:latest
     command: logstash -f /etc/logstash/conf.d/logstash.conf
