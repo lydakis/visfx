@@ -29,8 +29,6 @@ services:
   web:
     build: ./web
     command: npm start
-    volumes:
-      - ./web:/visfx
     ports:
       - "3000:3000"
     links:

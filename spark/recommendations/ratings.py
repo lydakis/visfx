@@ -27,9 +27,11 @@ def filter_daterange(rdd, end_date, daterange):
     end = dt.datetime.strptime(end_date, '%Y-%m-%d')
     start = end - parse_range(daterange)
     return rdd.filter(lambda item: dt.datetime.strptime(
-            item[1]['date_closed'], '%Y-%m-%dT%H:%M:%S.%fZ') < end) \
+            item[1]['date_closed'], '%Y-%m-%dT%H:%M:%S.%fZ') < end
+            if 'date_closed' in item[1] else False) \
         .filter(lambda item: dt.datetime.strptime(
-            item[1]['date_closed'], '%Y-%m-%dT%H:%M:%S.%fZ') > start) \
+            item[1]['date_closed'], '%Y-%m-%dT%H:%M:%S.%fZ') > start
+            if 'date_closed' in item[1] else False) \
         .map(lambda item: append_record(item, {
             'end_date': end_date,
             'range': daterange
@@ -66,10 +68,11 @@ def calc_rating(rdd):
             if max_count != min_count else 10
     }))
 
-def get_ratings(rdd, end_date, daterange):
-    rdd = filter_daterange(rdd, end_date, daterange)
-    providers = get_providers(rdd).collect()
-    return [calc_rating(count_pairs(rdd, provider)) for provider in providers]
+def get_ratings(sc, rdd, end_date, daterange):
+    rdd = filter_daterange(rdd, end_date, daterange).cache()
+    providers = sc.broadcast(get_providers(rdd).collect())
+    return [calc_rating(count_pairs(rdd, provider))
+        for provider in providers.value]
 
 def save_ratings(ratings, index, key=None):
     for rating in ratings:
@@ -80,5 +83,5 @@ if __name__ == '__main__':
     sc = SparkContext(conf=conf)
 
     es_rdd = get_es_rdd(sc, 'forex/transaction')
-    ratings = get_ratings(es_rdd, '2015-05-01', '1y')
+    ratings = get_ratings(sc, es_rdd, '2015-05-01', '1y')
     save_ratings(ratings, 'forex/rating', 'rating_id')
