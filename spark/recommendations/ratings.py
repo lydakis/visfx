@@ -57,7 +57,7 @@ def pnl_per_amount(pnl_rdd, amount_rdd):
 def normalize_feature(rdd):
     max_value = rdd.map(lambda item: item[1]).max()
     count = rdd.count()
-    average = rdd\
+    average = rdd \
         .map(lambda item: item[1]) \
         .reduce(lambda a, b: a + b) / float(count)
     return rdd.map(lambda item: (item[0], float(item[1] - average) / max_value))
