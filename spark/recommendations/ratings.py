@@ -2,9 +2,6 @@ from pyspark import SparkContext, SparkConf
 from elasticsearch_interface import es_read_conf, es_write_conf, \
     get_es_rdd, save_es_rdd
 
-def get_providers(rdd):
-    return rdd.map(lambda item: item[1]['provider_id']).distinct()
-
 def parse_range(daterange):
     import datetime as dt
     if 'd' in daterange:
@@ -18,10 +15,6 @@ def parse_range(daterange):
     else:
         raise
 
-def append_record(item, record):
-    item[1].update(record)
-    return item
-
 def filter_daterange(rdd, end_date, daterange):
     import datetime as dt
     end = dt.datetime.strptime(end_date, '%Y-%m-%d')
@@ -31,34 +24,7 @@ def filter_daterange(rdd, end_date, daterange):
             if 'date_closed' in item[1] else False) \
         .filter(lambda item: dt.datetime.strptime(
             item[1]['date_closed'], '%Y-%m-%dT%H:%M:%S.%fZ') > start
-            if 'date_closed' in item[1] else False) \
-        .map(lambda item: append_record(item, {
-            'end_date': end_date,
-            'range': daterange
-        }))
-
-def filter_provider(rdd, provider):
-    return rdd.filter(lambda item: provider == item[1]['provider_id'])
-
-def count_pairs(rdd, provider):
-    doc = rdd.first()[1]
-    end_date = doc['end_date']
-    daterange = doc['range']
-    pair_counts = rdd \
-        .filter(lambda item: provider == item[1]['provider_id']) \
-        .map(lambda item: item[1]['currency_pair']) \
-        .map(lambda pair: (pair, 1)) \
-        .reduceByKey(lambda a, b: a + b) \
-        .map(lambda item: (
-            str(provider) + ':' + item[0] + ':' + end_date + ':' + daterange, {
-                'provider_id': provider,
-                'end_date': end_date,
-                'range': daterange,
-                'currency_pair': item[0],
-                'count': item[1]
-            }
-        ))
-    return pair_counts
+            if 'date_closed' in item[1] else False)
 
 def count_pairs(rdd):
     return rdd \
@@ -105,7 +71,7 @@ def generate_features(rdd):
     return {
         'per_currency': {
             'pair_counts': normalize_feature(count_rdd),
-            'total_amount' normalize_feature(amount_rdd),
+            'total_amount': normalize_feature(amount_rdd),
             'total_pair_pnl': normalize_feature(pnl_rdd),
             'pnl_per_amount': normalize_feature(pnl_per_amount_rdd)
         },
@@ -117,39 +83,80 @@ def generate_features(rdd):
 def generate_weights():
     return {
         'per_currency': {
-            'pair_counts': 0.5,
-            'total_amount' 0.5,
-            'total_pair_pnl': 0.5,
-            'pnl_per_amount': 0.5
+            'pair_counts': 1.0,
+            'total_amount': 1.0,
+            'total_pair_pnl': 1.0,
+            'pnl_per_amount': 1.0
         },
         'per_provider': {
-            'total_provider_pnl': 0.5
+            'total_provider_pnl': 1.0
         }
     }
 
-def calc_rating(features, weights):
-    pass
+def apply_weights(features, weights):
+    for feature_type, feature_dict in features.iteritems():
+        for feature, _ in feature_dict.iteritems():
+            features[feature_type][feature] = features[feature_type][feature] \
+                .map(lambda item:
+                    (item[0], weights[feature_type][feature] * item[1])).cache()
+    return features
 
-def calc_rating(rdd):
-    max_count = rdd.takeOrdered(
-        1, key = lambda item: -item[1]['count'])[0][1]['count']
-    min_count = rdd.takeOrdered(
-        1, key = lambda item: item[1]['count'])[0][1]['count']
-    return rdd.map(lambda item: append_record(item, {
-        'rating_id': item[0],
-        'rating': 1+(9.0*(item[1]['count']-min_count)/(max_count-min_count))
-            if max_count != min_count else 10
-    }))
+def calc_ratings(sc, features):
+    per_currency = sc \
+        .union([feature_value
+            for _,feature_value in weighted_features['per_currency'].iteritems()]) \
+        .reduceByKey(lambda a, b: a + b) \
+        .map(lambda item: (item[0][0], {
+            'provider_id': item[0][0],
+            'currency_pair': item[0][1],
+            'rating': item[1]
+        })).cache()
+    per_provider = sc \
+        .union([feature_value
+            for _,feature_value in weighted_features['per_provider'].iteritems()]) \
+        .reduceByKey(lambda a, b: a + b) \
+        .map(lambda item: (item[0], {
+            'provider_id': item[0],
+            'rating': item[1]
+        })).cache()
+    def add_ratings(r1, r2):
+        return {
+            'provider_id': r1['provider_id'],
+            'currency_pair': r1['currency_pair'] \
+                if 'currency_pair' in r1 else r2['currency_pair'],
+            'rating': r1['rating'] + r2['rating']
+        }
+    return sc \
+        .union([per_currency, per_provider]) \
+        .reduceByKey(lambda a, b: add_ratings(a, b))
+
+def format_ratings(ratings, end_date, daterange):
+    def modify_record(record, append):
+        record.update(append)
+        return record
+    max_rating = ratings.map(lambda item: item[1]['rating']).cache().max()
+    min_rating = ratings.map(lambda item: item[1]['rating']).min()
+    return ratings.map(lambda item: (str(item[1]['provider_id']) + ':' +
+        item[1]['currency_pair'] + ':' + end_date + ':' + daterange,
+        modify_record(item[1], append={
+            'rating_id': str(item[1]['provider_id']) + ':' +
+                item[1]['currency_pair'] + ':' + end_date + ':' + daterange,
+            'end_date': end_date,
+            'range': daterange,
+            'rating': 10 * float(item[1]['rating'] - min_rating)
+                / (max_rating - min_rating) if max_rating != min_rating else 10
+        })))
 
 def get_ratings(sc, rdd, end_date, daterange):
-    rdd = filter_daterange(rdd, end_date, daterange).cache()
-    providers = sc.broadcast(get_providers(rdd).collect())
-    return [calc_rating(count_pairs(rdd, provider))
-        for provider in providers.value]
+    filtered_rdd = filter_daterange(rdd, end_date, daterange).cache()
+    features = generate_features(filtered_rdd)
+    weights = generate_weights()
+    weighted_features = apply_weights(features, weights)
+    ratings = calc_ratings(sc, weighted_features).cache()
+    return format_ratings(ratings, end_date, daterange)
 
 def save_ratings(ratings, index, key=None):
-    for rating in ratings:
-        save_es_rdd(rating, index, key)
+    save_es_rdd(ratings, index, key)
 
 if __name__ == '__main__':
     conf = SparkConf().setAppName('Compute Currency Ratings')
