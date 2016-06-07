@@ -15,16 +15,11 @@ def parse_range(daterange):
     else:
         raise
 
-def filter_daterange(rdd, end_date, daterange):
+def parse_dates(end_date, daterange):
     import datetime as dt
-    end = dt.datetime.strptime(end_date, '%Y-%m-%d')
-    start = end - parse_range(daterange)
-    return rdd.filter(lambda item: dt.datetime.strptime(
-            item[1]['date_closed'], '%Y-%m-%dT%H:%M:%S.%fZ') < end
-            if 'date_closed' in item[1] else False) \
-        .filter(lambda item: dt.datetime.strptime(
-            item[1]['date_closed'], '%Y-%m-%dT%H:%M:%S.%fZ') > start
-            if 'date_closed' in item[1] else False)
+    end_date = dt.datetime.strptime(end_date, '%Y-%m-%d')
+    start_date = end_date - parse_range(daterange)
+    return start_date.isoformat(), end_date.isoformat()
 
 def count_pairs(rdd):
     return rdd \
@@ -148,8 +143,7 @@ def format_ratings(ratings, end_date, daterange):
         })))
 
 def get_ratings(sc, rdd, end_date, daterange):
-    filtered_rdd = filter_daterange(rdd, end_date, daterange).cache()
-    features = generate_features(filtered_rdd)
+    features = generate_features(rdd)
     weights = generate_weights()
     weighted_features = apply_weights(features, weights)
     ratings = calc_ratings(sc, weighted_features).cache()
@@ -162,6 +156,7 @@ if __name__ == '__main__':
     conf = SparkConf().setAppName('Compute Currency Ratings')
     sc = SparkContext(conf=conf)
 
-    es_rdd = get_es_rdd(sc, 'forex/transaction')
-    ratings = get_ratings(sc, es_rdd, '2015-05-01', '1y')
+    start_date, end_date = parse_dates('2015-05-01', '1d')
+    es_rdd = get_es_rdd(sc, 'forex/transaction', start_date, end_date)
+    ratings = get_ratings(sc, es_rdd, '2015-05-01', '1d')
     save_ratings(ratings, 'forex/rating', 'rating_id')
