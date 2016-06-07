@@ -104,7 +104,7 @@ def apply_weights(features, weights):
 def calc_ratings(sc, features):
     per_currency = sc \
         .union([feature_value
-            for _,feature_value in weighted_features['per_currency'].iteritems()]) \
+            for _,feature_value in features['per_currency'].iteritems()]) \
         .reduceByKey(lambda a, b: a + b) \
         .map(lambda item: (item[0][0], {
             'provider_id': item[0][0],
@@ -113,7 +113,7 @@ def calc_ratings(sc, features):
         })).cache()
     per_provider = sc \
         .union([feature_value
-            for _,feature_value in weighted_features['per_provider'].iteritems()]) \
+            for _,feature_value in features['per_provider'].iteritems()]) \
         .reduceByKey(lambda a, b: a + b) \
         .map(lambda item: (item[0], {
             'provider_id': item[0],
