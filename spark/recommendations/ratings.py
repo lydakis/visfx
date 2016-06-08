@@ -1,4 +1,4 @@
-from pyspark import SparkContext, SparkConf
+from pyspark import SparkContext, SparkConf, StorageLevel
 from elasticsearch_interface import es_read_conf, es_write_conf, \
     get_es_rdd, save_es_rdd
 
@@ -157,6 +157,7 @@ if __name__ == '__main__':
     sc = SparkContext(conf=conf)
 
     start_date, end_date = parse_dates('2015-05-01', '1y')
-    es_rdd = get_es_rdd(sc, 'forex/transaction', start_date, end_date).cache()
+    es_rdd = get_es_rdd(sc, 'forex/transaction', start_date, end_date) \
+        .persist(StorageLevel.MEMORY_AND_DISK)
     ratings = get_ratings(sc, es_rdd, '2015-05-01', '1y')
     save_ratings(ratings, 'forex/rating', 'rating_id')

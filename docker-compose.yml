@@ -16,6 +16,8 @@ services:
     ports:
       - 8088:8088
       - 8042:8042
+    links:
+      - search
   logstash:
     image: logstash:latest
     command: logstash -f /etc/logstash/conf.d/logstash.conf
