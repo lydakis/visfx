@@ -23,9 +23,17 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
     ask_price real NOT NULL
   );
 
+  CREATE TABLE currency_pair (
+    currency_pair_id serial PRIMARY KEY,
+    currency_pair varchar (10) UNIQUE NOT NULL
+  );
+
   COPY transaction(provider_id, currency_pair, transaction_type, amount, date_open, date_closed, net_pnl, country, language)
   FROM '/tmp/data/transaction/2015.csv' DELIMITER ',' CSV HEADER;
 
   COPY history(currency_pair, tick_date, bid_price, ask_price)
   FROM '/tmp/data/history/2015.csv' DELIMITER ',' CSV HEADER;
+
+  INSERT INTO currency_pair (currency_pair)
+  SELECT DISTINCT currency_pair FROM transaction;
 EOSQL
