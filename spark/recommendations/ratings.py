@@ -1,25 +1,7 @@
 from pyspark import SparkContext, SparkConf, StorageLevel
 from elasticsearch_interface import es_read_conf, es_write_conf, \
     get_es_rdd, save_es_rdd
-
-def parse_range(daterange):
-    import datetime as dt
-    if 'd' in daterange:
-        return dt.timedelta(days=int(daterange.replace('d', '')))
-    elif 'w' in daterange:
-        return dt.timedelta(weeks=int(daterange.replace('w', '')))
-    elif 'm' in daterange:
-        return dt.timedelta(weeks=4*int(daterange.replace('m', '')))
-    elif 'y' in daterange:
-        return dt.timedelta(weeks=48*int(daterange.replace('y', '')))
-    else:
-        raise
-
-def parse_dates(end_date, daterange):
-    import datetime as dt
-    end_date = dt.datetime.strptime(end_date, '%Y-%m-%d')
-    start_date = end_date - parse_range(daterange)
-    return start_date.isoformat(), end_date.isoformat()
+from util import parse_range, parse_dates, modify_record
 
 def count_pairs(rdd):
     return rdd \
@@ -126,18 +108,16 @@ def calc_ratings(sc, features):
         .reduceByKey(lambda a, b: add_ratings(a, b))
 
 def format_ratings(ratings, end_date, daterange):
-    def modify_record(record, append):
-        record.update(append)
-        return record
     max_rating = ratings.map(lambda item: item[1]['rating']).cache().max()
     min_rating = ratings.map(lambda item: item[1]['rating']).min()
+    start, end = parse_dates(end_date, daterange)
     return ratings.map(lambda item: (str(item[1]['provider_id']) + ':' +
         item[1]['currency_pair'] + ':' + end_date + ':' + daterange,
         modify_record(item[1], append={
             'rating_id': str(item[1]['provider_id']) + ':' +
                 item[1]['currency_pair'] + ':' + end_date + ':' + daterange,
-            'end_date': end_date,
-            'range': daterange,
+            'start_date': start,
+            'end_date': end,
             'rating': 10 * float(item[1]['rating'] - min_rating)
                 / (max_rating - min_rating) if max_rating != min_rating else 10
         })))
@@ -156,8 +136,8 @@ if __name__ == '__main__':
     conf = SparkConf().setAppName('Compute Currency Ratings')
     sc = SparkContext(conf=conf)
 
-    start_date, end_date = parse_dates('2015-05-01', '1y')
-    es_rdd = get_es_rdd(sc, 'forex/transaction', start_date, end_date) \
-        .persist(StorageLevel.MEMORY_AND_DISK)
-    ratings = get_ratings(sc, es_rdd, '2015-05-01', '1y')
+    start_date, end_date = parse_dates('2015-05-01', '1d')
+    es_rdd = get_es_rdd(sc, 'forex/transaction', 'date_closed',
+        start_date, end_date).persist(StorageLevel.MEMORY_AND_DISK)
+    ratings = get_ratings(sc, es_rdd, '2015-05-01', '1d')
     save_ratings(ratings, 'forex/rating', 'rating_id')
