@@ -14,7 +14,8 @@ services:
     build: ./spark
     command: -d
     volumes:
-      - ./spark .
+      - ./spark/recommendations:/recommendations
+      - ./spark/predictions:/predictions
     ports:
       - 8088:8088
       - 8042:8042
