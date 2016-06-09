@@ -1,7 +1,7 @@
 from pyspark import SparkContext, SparkConf, StorageLevel
 from elasticsearch_interface import es_read_conf, es_write_conf, \
     get_es_rdd, save_es_rdd
-from util import parse_range, parse_dates, modify_record
+from utils import parse_range, parse_dates, modify_record
 
 def count_pairs(rdd):
     return rdd \
