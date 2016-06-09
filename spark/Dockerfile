@@ -5,5 +5,3 @@ RUN pip install --upgrade pip
 RUN pip install numpy nose pandas
 
 COPY elasticsearch-hadoop-2.3.2.jar .
-RUN mkdir recommendations
-COPY recommendations recommendations
