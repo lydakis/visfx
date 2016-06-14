@@ -3,3 +3,5 @@ node_modules/
 db/data/
 npm-debug.log
 *.pyc
+derby.log
+metastore_db/
