@@ -23,10 +23,8 @@ services:
     links:
       - search
   logstash:
-    image: logstash:latest
+    build: ./logstash
     command: logstash -f /etc/logstash/conf.d/logstash.conf
-    volumes:
-      - ./logstash/config:/etc/logstash/conf.d
     ports:
       - "5000:5000"
     links:
