@@ -11,27 +11,47 @@ def count_pairs(rdd):
             ((item[1]['provider_id'], item[1]['currency_pair']), 1)) \
         .reduceByKey(lambda a, b: a + b)
 
-def total_amount(rdd):
+def net_amount(rdd):
     return rdd \
         .map(lambda item: ((item[1]['provider_id'], item[1]['currency_pair']),
             item[1]['amount'])) \
         .reduceByKey(lambda a, b: a + b)
 
-def total_pair_pnl(rdd):
+def net_pnl(rdd):
     return rdd \
         .map(lambda item: ((item[1]['provider_id'], item[1]['currency_pair']),
             item[1]['net_pnl'])) \
-        .reduceByKey(lambda a, b: a + b)
-
-def total_provider_pnl(rdd):
-    return rdd \
-        .map(lambda item: (item[1]['provider_id'], item[1]['net_pnl'])) \
         .reduceByKey(lambda a, b: a + b)
 
 def pnl_per_amount(pnl_rdd, amount_rdd):
     per_amount = amount_rdd.map(lambda item: (item[0], 1.0 / item[1]))
     union = pnl_rdd.union(per_amount)
     return union.reduceByKey(lambda a, b: a * b)
+
+def net_provider_pnl(rdd):
+    return rdd \
+        .map(lambda item: (item[1]['provider_id'], item[1]['net_pnl'])) \
+        .reduceByKey(lambda a, b: a + b)
+
+def net_provider_amount(rdd):
+    return rdd \
+        .map(lambda item: (item[1]['provider_id'], item[1]['amount'])) \
+        .reduceByKey(lambda a, b: a + b)
+
+def total_pair_count(rdd):
+    return rdd \
+        .map(lambda item: (item[1]['currency_pair'], 1)) \
+        .reduceByKey(lambda a, b: a + b)
+
+def net_pair_amount(rdd):
+    return rdd \
+        .map(lambda item: (item[1]['currency_pair'], item[1]['amount'])) \
+        .reduceByKey(lambda a, b: a + b)
+
+def net_pair_pnl(rdd):
+    return rdd \
+        .map(lambda item: (item[1]['currency_pair'], item[1]['net_pnl'])) \
+        .reduceByKey(lambda a, b: a + b)
 
 def normalize_feature(rdd):
     max_value = rdd.map(lambda item: item[1]).max()
@@ -43,32 +63,63 @@ def normalize_feature(rdd):
 
 def generate_features(rdd):
     count_rdd = count_pairs(rdd)
-    pnl_rdd = total_pair_pnl(rdd)
-    amount_rdd = total_amount(rdd)
+    amount_rdd = net_amount(rdd)
+    pnl_rdd = net_pnl(rdd)
+    keys = get_keys(pnl_rdd).cache()
     pnl_per_amount_rdd = pnl_per_amount(pnl_rdd, amount_rdd)
     provider_pnl_rdd = canonicalize_keys(
-        total_provider_pnl(rdd), get_keys(pnl_rdd))
+        net_provider_pnl(rdd), keys, provider=True)
+    provider_amount_rdd = canonicalize_keys(
+        net_provider_amount(rdd), keys, provider=True)
+    provider_pnl_per_amount_rdd = \
+        pnl_per_amount(provider_pnl_rdd, provider_amount_rdd)
+    total_pair_count_rdd = canonicalize_keys(
+        total_pair_count(rdd), keys, currency_pair=True)
+    total_pair_amount_rdd = canonicalize_keys(
+        net_pair_amount(rdd), keys, currency_pair=True)
+    total_pair_pnl_rdd = canonicalize_keys(
+        net_pair_pnl(rdd), keys, currency_pair=True)
+    total_pair_pnl_per_amount_rdd = \
+        pnl_per_amount(total_pair_pnl_rdd, total_pair_amount_rdd)
     return {
         'pair_counts': normalize_feature(count_rdd),
-        'total_amount': normalize_feature(amount_rdd),
-        'total_pair_pnl': normalize_feature(pnl_rdd),
+        'net_amount': normalize_feature(amount_rdd),
+        'net_pair_pnl': normalize_feature(pnl_rdd),
         'pnl_per_amount': normalize_feature(pnl_per_amount_rdd),
-        'total_provider_pnl': normalize_feature(provider_pnl_rdd)
+        'provider_pnl': normalize_feature(provider_pnl_rdd),
+        'provider_amount': normalize_feature(provider_amount_rdd),
+        'provider_pnl_per_amount': normalize_feature(
+            provider_pnl_per_amount_rdd),
+        'net_pair_count': normalize_feature(total_pair_count_rdd),
+        'pair_amount': normalize_feature(total_pair_amount_rdd),
+        'pair_pnl': normalize_feature(total_pair_pnl_rdd),
+        'pair_pnl_per_amount': normalize_feature(total_pair_pnl_per_amount_rdd)
     }
 
 def get_keys(rdd):
     return rdd.sortByKey().map(lambda item: (item[0]))
 
-def canonicalize_keys(feature, keys):
-    return feature.join(keys).map(lambda x: ((x[0], x[1][1]), x[1][0]))
+def canonicalize_keys(feature, keys, provider=False, currency_pair=False):
+    if provider:
+        return feature.join(keys).map(lambda x: ((x[0], x[1][1]), x[1][0]))
+    if currency_pair:
+        return feature \
+            .join(keys.map(lambda x: (x[1], x[0]))) \
+            .map(lambda x: ((x[1][1], x[0]), x[1][0]))
 
 def generate_weights():
     return {
         'pair_counts': 1.0,
-        'total_amount': 1.0,
-        'total_pair_pnl': 1.0,
+        'net_amount': 1.0,
+        'net_pair_pnl': 1.0,
         'pnl_per_amount': 1.0,
-        'total_provider_pnl': 1.0
+        'provider_pnl': 1.0,
+        'provider_amount': 1.0,
+        'provider_pnl_per_amount': 1.0,
+        'net_pair_count': 1.0,
+        'pair_amount': 1.0,
+        'pair_pnl': 1.0,
+        'pair_pnl_per_amount': 1.0
     }
 
 def apply_weights(features, weights):
@@ -115,9 +166,6 @@ def linear_combination(sc, features):
             'rating': item[1]
         })).cache()
 
-def calc_ratings(sc, features, method):
-    return method(sc, features)
-
 def format_ratings(ratings, end_date, daterange):
     max_rating = ratings.map(lambda item: item[1]['rating']).cache().max()
     min_rating = ratings.map(lambda item: item[1]['rating']).min()
@@ -145,9 +193,9 @@ def format_ratings_no_normalization(ratings, end_date, daterange):
             'rating': item[1]['rating']
         })))
 
-def get_ratings(sc, rdd, end_date, daterange):
+def get_ratings(sc, rdd, rating_function, end_date, daterange):
     features = generate_features(rdd)
-    ratings = calc_ratings(sc, features, method=pca)
+    ratings = rating_function(sc, features)
     return format_ratings_no_normalization(ratings, end_date, daterange)
 
 def save_ratings(ratings, index, key=None):
@@ -157,9 +205,9 @@ if __name__ == '__main__':
     conf = SparkConf().setAppName('Compute Currency Ratings')
     sc = SparkContext(conf=conf)
 
-    start_date, end_date = parse_dates('2015-05-01', '1d')
+    start_date, end_date = parse_dates('2015-05-01', '7d')
     es_rdd = get_es_rdd(sc, index='forex/transaction', date_field='date_closed',
         start_date=start_date, end_date=end_date) \
             .persist(StorageLevel.MEMORY_AND_DISK)
-    ratings = get_ratings(sc, es_rdd, '2015-05-01', '1d')
+    ratings = get_ratings(sc, es_rdd, pca, '2015-05-01', '7d')
     save_ratings(ratings, 'forex/rating', 'rating_id')
