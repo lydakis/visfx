@@ -98,7 +98,7 @@ def pca(sc, features):
     sigma = (1.0 / m) * np.dot(feature_matrix, np.transpose(feature_matrix))
     U, _, _ = svd(sigma)
     ratings = sc.parallelize(
-        np.dot(np.transpose(U[1]), feature_matrix).tolist())
+        np.dot(np.transpose(U[0]), feature_matrix).tolist())
     keys = get_keys(features['pair_counts'])
     return format_pca(ratings, keys).cache()
 
@@ -133,10 +133,22 @@ def format_ratings(ratings, end_date, daterange):
                 / (max_rating - min_rating) if max_rating != min_rating else 10
         })))
 
+def format_ratings_no_normalization(ratings, end_date, daterange):
+    start, end = parse_dates(end_date, daterange)
+    return ratings.map(lambda item: (str(item[1]['provider_id']) + ':' +
+        item[1]['currency_pair'] + ':' + end_date + ':' + daterange,
+        modify_record(item[1], append={
+            'rating_id': str(item[1]['provider_id']) + ':' +
+                item[1]['currency_pair'] + ':' + end_date + ':' + daterange,
+            'start_date': start,
+            'end_date': end,
+            'rating': item[1]['rating']
+        })))
+
 def get_ratings(sc, rdd, end_date, daterange):
     features = generate_features(rdd)
     ratings = calc_ratings(sc, features, method=pca)
-    return format_ratings(ratings, end_date, daterange)
+    return format_ratings_no_normalization(ratings, end_date, daterange)
 
 def save_ratings(ratings, index, key=None):
     save_es_rdd(ratings, index, key)
