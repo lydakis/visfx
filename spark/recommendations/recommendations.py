@@ -1,4 +1,5 @@
 from pyspark import SparkContext, SparkConf, StorageLevel
+from pyspark.sql import SQLContext
 from pyspark.ml.recommendation import ALS
 from elasticsearch_interface import get_es_rdd, save_es_rdd, \
     get_currency_pair_dict
@@ -50,7 +51,7 @@ def get_counts_and_averages(ID_and_ratings_tuple):
     return ID_and_ratings_tuple[0], \
         (nratings, float(sum(x for x in ID_and_ratings_tuple[1]))/nratings)
 
-def generate_new_user_recommendations(
+def generate_new_user_recommendations(sqlContext,
     ratings, best_rank, currency_pair_rdd, new_user_id, new_user_ratings):
     new_user_ratings_df = \
         sqlContext.createDataFrame(new_user_ratings, ["user", "item", "rating"])
@@ -84,6 +85,7 @@ def get_top_currency_pairs_recommendation(
 if __name__ == '__main__':
     conf = SparkConf().setAppName('Currency Recommendations')
     sc = SparkContext(conf=conf)
+    sqlContext = SQLContext(sc)
 
     currency_pair_dict = get_currency_pair_dict(sc)
     start_date, end_date = parse_dates('2015-05-01', '7d')
@@ -118,7 +120,7 @@ if __name__ == '__main__':
         (0, 37, -0.28990308363778161)
     ]
 
-    new_user_recommendations_df = generate_new_user_recommendations(
+    new_user_recommendations_df = generate_new_user_recommendations(sqlContext,
         ratings, best_rank, currency_pair_rdd, new_user_id, new_user_ratings)
 
     top_currency_pairs = get_top_currency_pairs_recommendation(
