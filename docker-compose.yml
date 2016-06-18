@@ -8,8 +8,8 @@ services:
     build: ./search
     command: elasticsearch -Des.network.host=0.0.0.0
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - 9200:9200
+      - 9300:9300
   spark:
     build: ./spark
     command: -d
@@ -26,7 +26,7 @@ services:
     build: ./logstash
     command: logstash -f /etc/logstash/conf.d/logstash.conf
     ports:
-      - "5000:5000"
+      - 5000:5000
     links:
       - db
       - search
@@ -34,6 +34,12 @@ services:
     build: ./web
     command: npm start
     ports:
-      - "3000:3000"
+      - 3000:3000
+    links:
+      - search
+  kibana:
+    build: ./kibana
+    ports:
+      - 5601:5601
     links:
       - search
