@@ -1,5 +1,6 @@
 from pyspark import SparkContext, SparkConf, StorageLevel
 import numpy as np
+import math
 from numpy.linalg import svd
 from elasticsearch_interface \
     import get_es_rdd, save_es_rdd, get_currency_pair_dict
@@ -107,19 +108,25 @@ def canonicalize_keys(feature, keys, provider=False, currency_pair=False):
             .join(keys.map(lambda x: (x[1], x[0]))) \
             .map(lambda x: ((x[1][1], x[0]), x[1][0]))
 
-def generate_weights():
+def generate_weights(features):
+    feature_matrix = generate_feature_matrix(features)
+    m = len(feature_matrix[0])
+    sigma = (1.0 / m) * np.dot(feature_matrix, np.transpose(feature_matrix))
+    U, _, _ = svd(sigma)
+    U = U[0].tolist()
+    U = map(lambda x: x - min(U) + 1, U)
     return {
-        'pair_counts': 1.0,
-        'net_amount': 1.0,
-        'net_pair_pnl': 1.0,
-        'pnl_per_amount': 1.0,
-        'provider_pnl': 1.0,
-        'provider_amount': 1.0,
-        'provider_pnl_per_amount': 1.0,
-        'net_pair_count': 1.0,
-        'pair_amount': 1.0,
-        'pair_pnl': 1.0,
-        'pair_pnl_per_amount': 1.0
+        'pair_counts': U[2],
+        'net_amount': U[9],
+        'net_pair_pnl': U[10],
+        'pnl_per_amount': U[5],
+        'provider_pnl': U[6],
+        'provider_amount': U[3],
+        'provider_pnl_per_amount': U[0],
+        'net_pair_count': U[1],
+        'pair_amount': U[4],
+        'pair_pnl': U[7],
+        'pair_pnl_per_amount': U[8]
     }
 
 def apply_weights(features, weights):
@@ -154,7 +161,7 @@ def pca(sc, features):
     return format_pca(ratings, keys).cache()
 
 def linear_combination(sc, features):
-    weights = generate_weights()
+    weights = generate_weights(features)
     weighted_features = apply_weights(features, weights)
     return sc \
         .union([feature_values
@@ -196,7 +203,7 @@ def format_ratings_no_normalization(ratings, end_date, daterange):
 def get_ratings(sc, rdd, rating_function, end_date, daterange):
     features = generate_features(rdd)
     ratings = rating_function(sc, features)
-    return format_ratings_no_normalization(ratings, end_date, daterange)
+    return format_ratings(ratings, end_date, daterange)
 
 def save_ratings(ratings, index, key=None):
     save_es_rdd(ratings, index, key)

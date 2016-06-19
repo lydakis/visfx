@@ -97,7 +97,7 @@ if __name__ == '__main__':
         .map(lambda item:
             (item[1]['currency_pair_id'], item[1]['currency_pair']))
 
-    ratings = get_ratings(sc, es_rdd, pca, '2015-05-01', '7d') \
+    ratings = get_ratings(sc, es_rdd, linear_combination, '2015-05-01', '7d') \
         .map(lambda item: (
             item[1]['provider_id'],
             currency_pair_dict[item[1]['currency_pair']],
@@ -114,10 +114,10 @@ if __name__ == '__main__':
 
     new_user_id = 0
     new_user_ratings = [
-        (0, 11, -0.27364467534226611),
-        (0, 72, -0.24467350077258987),
-        (0, 47, 0.49944447720095908),
-        (0, 37, -0.28990308363778161)
+        (0, 11, 9.9025095581621425),
+        (0, 72, 9.9251950795087698),
+        (0, 47, 9.9575823872693228),
+        (0, 37, 9.8444613457560095)
     ]
 
     new_user_recommendations_df = generate_new_user_recommendations(sqlContext,
