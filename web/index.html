@@ -5,17 +5,34 @@
     <title>Visfx</title>
     <meta name="viewport" content="width=device-width">
     <script src="node_modules/jquery/jquery.min.js" type="text/javascript"></script>
-    <script src="node_modules/d3/build/d3.min.js" type="text/javascript"></script>
+    <script src="node_modules/d3/d3.min.js" type="text/javascript"></script>
     <script src="node_modules/crossfilter/crossfilter.min.js" type="text/javascript"></script>
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="lib/js/d3.parcoords.js" type="text/javascript"></script>
+    <script src="lib/js/d3-queue.v3.min.js" type="text/javascript"></script>
 
     <link href="custom.css" rel="stylesheet">
     <link href="node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <link href="lib/css/d3.parcoords.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Libre+Baskerville|Playfair+Display" rel="stylesheet">
   </head>
   <body>
     <div class="container">
       <h1>Visfx</h1>
+      <p><em>A Forex Trading Visulization Solution</em></p>
+      <!-- Data Overview Section -->
+      <h3>Data Overview</h2>
+      <p>
+        Closed trades for the period starting on May 1 2015 and ending on May 31 2015.
+      </p>
+      <div id="parcoords-example" class="parcoords" style="width:1300px;margin-left:-220px;height:500px;"></div>
+      <!-- Feature Selection Section -->
+      <h3>Feature Selection</h3>
+      <p>
+        Select how much will a particular feature contribute on the calculation of the pseudo-ratings.
+      </p>
+      <!-- Recommendations Section -->
+      <h3>Recommendations</h3>
     </div>
 
     <script src="scripts/graphs.js" type="text/javascript"></script>

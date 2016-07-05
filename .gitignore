@@ -5,3 +5,4 @@ npm-debug.log
 *.pyc
 derby.log
 metastore_db/
+web/mock-data/
