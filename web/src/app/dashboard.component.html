@@ -7,6 +7,9 @@
   <div class="col-md-6">
     <showcase [daterange]="date"></showcase>
   </div>
+  <div class"col-md-6">
+    <area-chart *ngIf="areaChartConfig" [config]="areaChartConfig"></area-chart>
+  </div>
 </div>
 <div class="row">
   <div class="col-md-6"><line-chart [series]="data" [title]="title"></line-chart></div>
