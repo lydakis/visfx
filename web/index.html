@@ -7,30 +7,41 @@
     <script src="node_modules/jquery/jquery.min.js" type="text/javascript"></script>
     <script src="node_modules/d3/d3.min.js" type="text/javascript"></script>
     <script src="node_modules/crossfilter/crossfilter.min.js" type="text/javascript"></script>
+    <script src="node_modules/dc/dc.min.js" type="text/javascript"></script>
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="lib/js/d3.parcoords.js" type="text/javascript"></script>
     <script src="lib/js/d3-queue.v3.min.js" type="text/javascript"></script>
 
     <link href="custom.css" rel="stylesheet">
     <link href="node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <link href="node_modules/dc/dc.min.css" rel="stylesheet">
     <link href="lib/css/d3.parcoords.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Libre+Baskerville|Playfair+Display" rel="stylesheet">
   </head>
   <body>
     <div class="container">
       <h1>Visfx</h1>
-      <p><em>A Forex Trading Visulization Solution</em></p>
+      <p><em>A Forex Trading Visualization Solution</em></p>
       <!-- Data Overview Section -->
       <h3>Data Overview</h2>
-      <p>
-        Closed trades for the period starting on May 1 2015 and ending on May 31 2015.
-      </p>
-      <div id="parcoords-example" class="parcoords" style="width:1300px;margin-left:-220px;height:500px;"></div>
+      <p>A bird's eye view of the providers' transaction history.</p>
+      <span>Start Date: </span>
+      <input type="text" placeholder="MM/DD/YYYY" value="05/01/2015">
+      <span>End Date: </span>
+      <input type="text" placeholder="MM/DD/YYYY" value="05/31/2015">
+      <br>
+      <div id="parcoords-overview" class="parcoords" style="width:1300px;margin-left:-220px;height:500px;"></div>
+      <br>
+      <span>Select Provider ID: </span><span id="provider-value">All</em></span>
+      <div id="provider-range-div"></div>
+      <div class="row">
+        <div class="col-md-4">
+          <div id="linechart-example" class="linechart" style="width:500px;height:500px;"></div>
+        </div>
+      </div>
       <!-- Feature Selection Section -->
       <h3>Feature Selection</h3>
-      <p>
-        Select how much will a particular feature contribute on the calculation of the pseudo-ratings.
-      </p>
+      <p>Select how much a particular feature will contribute on the calculation of the pseudo-ratings.</p>
       <!-- Recommendations Section -->
       <h3>Recommendations</h3>
     </div>
