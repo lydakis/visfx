@@ -88,6 +88,7 @@ function makeGraphs(error, transactions) {
   this.linechart = dc.barChart("#ppa")
     .width(600)
     .height(400)
+    .margins({ top: 24, left: 60, bottom: 20, right: 0 })
     .dimension(transactionsByDateClosed)
     .group(transactionsByDateClosedGroup)
     .valueAccessor(function(d) { return +d.value.ppa; })
@@ -98,7 +99,8 @@ function makeGraphs(error, transactions) {
     .elasticY(true)
     .xUnits(function(){return 8;})
     .round(dc.round.floor)
-    .alwaysUseRounding(true);
+    .alwaysUseRounding(true)
+    .yAxisLabel('Net PNL per Amount');
 
   var piechart = dc.pieChart("#currency-counts")
     .width(400)
