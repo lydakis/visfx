@@ -11,6 +11,7 @@
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="lib/js/d3.parcoords.js" type="text/javascript"></script>
     <script src="lib/js/d3-queue.v3.min.js" type="text/javascript"></script>
+    <script src="lib/js/d3.svg.multibrush.js" type="text/javascript"></script>
 
     <link href="custom.css" rel="stylesheet">
     <link href="lib/css/bootstrap.css" rel="stylesheet">
@@ -28,15 +29,19 @@
       <span>Start Date: </span>
       <input type="text" placeholder="MM/DD/YYYY" value="05/01/2015">
       <span>End Date: </span>
-      <input type="text" placeholder="MM/DD/YYYY" value="05/31/2015">
+      <input type="text" placeholder="MM/DD/YYYY" value="05/07/2015">
       <br>
-      <div id="parcoords-overview" class="parcoords" style="width:1300px;margin-left:-220px;height:500px;"></div>
+      <div id="parcoords-overview" class="parcoords" style="width:1300px;margin-left:-220px;height:750px;"></div>
       <br>
       <span>Select Provider ID: </span><span id="provider-value">All</em></span>
       <div id="provider-range-div"></div>
       <div class="row">
-        <div class="col-md-4">
-          
+        <div class="col-md-6">
+          <div id="ppa" class="dc-charts" style="width:650px;height:400px;"></div>
+        </div>
+        <div class="col-md-6">
+          <div id="currency-counts" class="dc-charts" style="width:400px;height:400px;"></div>
+        </div>
       </div>
       <!-- Feature Selection Section -->
       <h3>Feature Selection</h3>

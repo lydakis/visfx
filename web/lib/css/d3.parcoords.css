@@ -1,4 +1,4 @@
-.parcoords > svg, .parcoords > canvas { 
+.parcoords > svg, .parcoords > canvas {
   font: 14px sans-serif;
   position: absolute;
 }
@@ -35,7 +35,7 @@
   -o-transition: opacity 0.3s;
 }
 .parcoords canvas.faded {
-  opacity: 0.25;
+  opacity: 0.15;
 }
 .parcoords {
 	-webkit-touch-callout: none;
