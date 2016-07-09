@@ -8,6 +8,7 @@ function makeGraphs(error, transactions) {
   this.transactions = transactions;
 
   transactions.forEach(function(d) {
+    d["transaction_id"] = +d["transaction_id"];
     d["Provider ID"] = +d["Provider ID"];
     d["Amount (lots)"] = +d["Amount (lots)"];
     d["Net PNL ($)"] = +d["Net PNL ($)"];
@@ -21,6 +22,10 @@ function makeGraphs(error, transactions) {
   });
   this.transactionsByProvider = transactionsByProvider;
   createInputRange(transactionsByProvider.group().size())
+
+  var transactionsByID = tr.dimension(function(d) {
+    return d["transaction_id"];
+  })
 
   var transactionsByDateClosed = tr.dimension(function(d) {
     return d3.time.format("%Y-%m-%d").parse(
@@ -55,22 +60,14 @@ function makeGraphs(error, transactions) {
 
   var transactionsByCurrencyGroup = transactionsByCurrency.group();
 
-  var minPPA = d3.min(transactionsByDateClosedGroup.all(), function(d) { return +d.value.ppa; });
-  var maxPPA = d3.max(transactionsByDateClosedGroup.all(), function(d) { return +d.value.ppa; })
-
-
   var colors = d3.scale.category20b();
-
-  // var colors = d3.scale.linear()
-  //   .domain([minPnL, maxPnL])
-  //   .range(["#b63032", "#346493"])
-  //   .interpolate(d3.interpolateLab);
 
   var color = function(d) { return colors(d["Provider ID"]); };
 
   this.parcoords = d3.parcoords()("#parcoords-overview")
     .data(transactions)
-    .hideAxis([])
+    .dimension(transactionsByID)
+    .hideAxis(["transaction_id"])
     .color(color)
     .height(750)
     .alpha(0.25)
@@ -84,25 +81,25 @@ function makeGraphs(error, transactions) {
   this.parcoords.svg.selectAll("text")
     .style("font", "8px sans-serif");
 
-
-  this.linechart = dc.barChart("#ppa")
+  var ppaChart = dc.barChart("#ppa")
     .width(600)
     .height(400)
     .margins({ top: 24, left: 60, bottom: 20, right: 0 })
     .dimension(transactionsByDateClosed)
     .group(transactionsByDateClosedGroup)
     .valueAccessor(function(d) { return +d.value.ppa; })
-    .x(d3.time.scale().domain([new Date(2015, 4, 1), new Date(2015, 4, 8)]))
+    .x(d3.time.scale().domain([new Date(2015, 3, 30), new Date(2015, 4, 8)]))
     .renderHorizontalGridLines(true)
     .brushOn(true)
     .clipPadding(10)
     .elasticY(true)
-    .xUnits(function(){return 8;})
+    .centerBar(true)
+    .xUnits(function(){return 10;})
     .round(dc.round.floor)
     .alwaysUseRounding(true)
     .yAxisLabel('Net PNL per Amount');
 
-  var piechart = dc.pieChart("#currency-counts")
+  var currencyCounts = dc.pieChart("#currency-counts")
     .width(400)
     .height(400)
     .radius(180)
@@ -125,6 +122,16 @@ function rangeChange() {
   else {
     value.innerHTML = "All"
     highlightProvider(null)
+  }
+}
+
+function toggleCheckbox() {
+  var checkbox = document.getElementById("checkbox");
+  if (true === checkbox.checked) {
+    this.parcoords.advancedFiltering(true);
+  }
+  else {
+    this.parcoords.advancedFiltering(false);
   }
 }
 
