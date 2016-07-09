@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from elasticsearch import Elasticsearch
+from elasticsearch.helpers import scan
 import json
 
 app = Flask(__name__)
@@ -12,21 +13,6 @@ ES_HOST = {
 }
 
 es = Elasticsearch([ES_HOST])
-
-query = json.dumps({
-    'query': {
-        'match_all': {}
-    },
-    'filter': {
-        'range': {
-            'date_closed': {
-                'gte': '2015-05-01',
-                'lte': '2015-05-07',
-                'format': 'yyyy-MM-dd'
-            }
-        }
-    }
-})
 
 @app.route('/')
 def health():
@@ -48,11 +34,20 @@ def get_transactions():
             }
         }
     })
-    res = es.search(
+    docs = list(scan(es,
+        query=query,
         index='forex',
-        body=query,
-        filter_path=['hits.hits._source'])
+        doc_type='transaction'))
+    res = [drop_keys(
+        doc['_source'], ['language', '@timestamp', 'type', '@version'])
+            for doc in docs]
     return jsonify(res)
+
+def drop_keys(dictionary, keys):
+    for key in keys:
+        if key in dictionary:
+            del dictionary[key]
+    return dictionary
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
