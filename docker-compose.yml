@@ -33,8 +33,11 @@ services:
   web:
     build: ./web
     command: npm start
+    volumes:
+      - ./web:/visfx
     ports:
       - 8080:8080
+      - 5000:5000
     links:
       - search
   kibana:

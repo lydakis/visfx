@@ -18,8 +18,9 @@
   },
   "scripts": {
     "clean": "npm cache clean && npm run rimraf -- node_modules",
-    "server": "http-server . --cors",
-    "start": "npm run server"
+    "server": "http-server . --cors &",
+    "api": "python server.py",
+    "start": "npm run server && npm run api"
   },
   "dependencies": {
     "bootstrap": "^3.3.6",
