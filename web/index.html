@@ -27,15 +27,15 @@
       <h3>Data Overview</h2>
       <p>A bird's eye view of the providers' transaction history.</p>
       <span>Start Date: </span>
-      <input type="text" placeholder="MM/DD/YYYY" value="05/01/2015">
+      <input id="start-date" type="text" placeholder="yyyy-MM-dd" value="2015-05-01" onchange="dateChanged()" onsubmit="dateChanged()">
       <span>End Date: </span>
-      <input type="text" placeholder="MM/DD/YYYY" value="05/07/2015">
+      <input id="end-date" type="text" placeholder="yyyy-MM-dd" value="2015-05-07" onchange="dateChanged()" onsubmit="dateChanged()">
       <br>
       <div id="parcoords-overview" class="parcoords" style="width:1300px;margin-left:-180px;height:750px;"></div>
       <br>
       <span>Select Provider ID: </span><span id="provider-value">All</em></span>
-      <div id="provider-range-div"></div>
-      <span>Enable Advanced filtering: </span>
+      <input id="provider-range" type="range" value="0" oninput="rangeChanged()" onchange="redrawCharts()">
+      <span>Toggle Advanced Filtering: </span>
       <input id="checkbox" type="checkbox" onchange="toggleCheckbox()">
       <div class="row">
         <div class="col-md-6">
