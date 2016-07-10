@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import scan
@@ -20,28 +20,33 @@ def health():
 
 @app.route('/transactions')
 def get_transactions():
-    query = json.dumps({
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    query = format_query(start_date, end_date)
+    docs = scan(es,
+        query=query,
+        index='forex',
+        doc_type='transaction')
+    res = [drop_keys(
+        doc['_source'], ['language', '@timestamp', 'type', '@version'])
+            for doc in docs]
+    return jsonify(res)
+
+def format_query(start_date, end_date):
+    return json.dumps({
         'query': {
             'match_all': {}
         },
         'filter': {
             'range': {
                 'date_closed': {
-                    'gte': '2015-05-01',
-                    'lte': '2015-05-07',
+                    'gte': start_date,
+                    'lte': end_date,
                     'format': 'yyyy-MM-dd'
                 }
             }
         }
     })
-    docs = list(scan(es,
-        query=query,
-        index='forex',
-        doc_type='transaction'))
-    res = [drop_keys(
-        doc['_source'], ['language', '@timestamp', 'type', '@version'])
-            for doc in docs]
-    return jsonify(res)
 
 def drop_keys(dictionary, keys):
     for key in keys:
