@@ -24,13 +24,16 @@ def get_transactions():
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
     query = format_query(start_date, end_date)
-    docs = scan(es,
-        query=query,
-        index='forex',
-        doc_type='transaction')
-    res = [drop_keys(
-        doc['_source'], ['language', '@timestamp', 'type', '@version'])
-            for doc in docs]
+    try:
+        docs = scan(es,
+            query=query,
+            index='forex',
+            doc_type='transaction')
+        res = [drop_keys(
+            doc['_source'], ['language', '@timestamp', 'type', '@version'])
+                for doc in docs]
+    except:
+        res = {} 
     return jsonify(res)
 
 def format_query(start_date, end_date):
