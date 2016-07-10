@@ -5,6 +5,7 @@ from elasticsearch.helpers import scan
 import json
 
 app = Flask(__name__)
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 CORS(app)
 
 ES_HOST = {
