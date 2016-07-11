@@ -81,7 +81,9 @@ function makeGraphs(error, transactions) {
   });
   var transactionsByDateClosedHourlyGroup = transactionsByDateClosedHourly.group()
 
-  var transactionsByPNLGroup = transactionsByID
+  var transactionsByPNLGroup = tr.dimension(function(d) {
+    return d.transaction_id;
+  })
     .groupAll().reduce(
       function(p, v) {
         p.net_pnl += v.net_pnl;
