@@ -3,6 +3,7 @@ d3.parcoords = function(config) {
     data: [],
     highlighted: [],
     dimensions: {},
+    dimension: {},
     dimensionTitleRotation: 0,
     brushed: false,
     brushedColor: null,
@@ -22,6 +23,7 @@ d3.parcoords = function(config) {
     smoothness: 0.0,
     showControlPoints: false,
     hideAxis : [],
+    advancedFiltering: false
   };
 
   extend(__, config);
@@ -1638,6 +1640,13 @@ pc.brushMode = function(mode) {
     	// to avoid unnecessary computation.
         brushUpdated(selected());
         events.brushend.call(pc, __.brushed);
+        __.dimension.filterAll();
+        dc.redrawAll();
+        d3.queue().defer(filterBrushed, __.brushed)
+          .await(function(error) {
+            if (error) throw error;
+            dc.redrawAll();
+          });
       })
       .extentAdaption(function(selection) {
     	  selection
@@ -1654,6 +1663,17 @@ pc.brushMode = function(mode) {
 
     brushes[axis] = brush;
     return brush;
+  }
+
+  function filterBrushed(brushed, callback) {
+    if (__.advancedFiltering && brushed.length !== __.data.length) {
+      __.dimension.filter(function(d) {
+        return brushed.map(function(d) {
+          return d.transaction_id;
+        }).indexOf(d) + 1;
+      });
+    }
+    callback(null);
   }
 
   function brushReset(dimension) {
