@@ -141,7 +141,7 @@ function makeGraphs(error, transactions) {
     .group(transactionsByDateClosedHourlyGroup)
 
   netPNL
-    .formatNumber(function(d) { return "$ " + d3.format(".2f")(d); })
+    .formatNumber(function(d) { return "$ " + d3.format(",.2f")(d); })
     .valueAccessor(function(d) { return d.net_pnl; })
     .group(transactionsByPNLGroup);
 
