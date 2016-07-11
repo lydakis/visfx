@@ -68,19 +68,11 @@ function makeGraphs(error, transactions) {
 
   var transactionsByCurrencyGroup = transactionsByCurrency.group();
 
-  var parcoordsDimensions = {
-    "provider_id": { index: 0, title: "Provider ID" },
-    "transaction_type": { index: 1, title: "Transation Type" },
-    "currency_pair": { index: 2, title: "Currency Pair" },
-    "country": { index: 3, title: "Country" },
-    "date_open": { index: 4, title: "Date Open" },
-    "date_closed": { index: 5, title: "Date Closed" },
-    "amount": { index: 6, title: "Amount (lots)" },
-    "net_pnl": { index: 7, title: "Net PnL ($)" },
-  };
+  var parcoordsDimensions = generateParcoordsDimensions();
 
   parcoords
     .data(transactions)
+    .dimension(transactionsByID)
     .dimensions(parcoordsDimensions)
     .margin({ top: 24, left: 150, bottom: 12, right: 0 })
     .mode("queue")
@@ -88,27 +80,6 @@ function makeGraphs(error, transactions) {
     .hideAxis(["transaction_id"])
     .brushMode("1D-axes-multi")
     .reorderable();
-
-  parcoords.on("brush", function(d) {
-    transactionsByID.filterAll();
-    dc.redrawAll();
-    d3.queue().defer(filterBrushed, d)
-      .await(function(error) {
-        if (error) throw error;
-        dc.redrawAll();
-      })
-  })
-
-  function filterBrushed(brushed, callback) {
-    if (advancedFiltering && brushed.length !== transactions.length) {
-      transactionsByID.filter(function(d) {
-        return brushed.map(function(d) {
-          return d.transaction_id;
-        }).indexOf(d) + 1;
-      });
-    }
-    callback(null);
-  }
 
   ppaChart
     .margins({ top: 24, left: 60, bottom: 20, right: 0 })
@@ -122,7 +93,7 @@ function makeGraphs(error, transactions) {
     .elasticY(true)
     .centerBar(true)
     .gap(10)
-    .xUnits(function(){return 10;})
+    .xUnits(d3.time.days)
     .round(dc.round.floor)
     .alwaysUseRounding(true)
     .yAxisLabel('Net PNL per Amount');
@@ -164,10 +135,10 @@ function rangeChanged() {
 function toggleCheckbox() {
   var checkbox = document.getElementById("checkbox");
   if (true === checkbox.checked) {
-    advancedFiltering = true;
+    parcoords.advancedFiltering(true);
   }
   else {
-    advancedFiltering = false;
+    parcoords.advancedFiltering(false);
   }
 }
 
@@ -176,29 +147,34 @@ function redrawCharts() {
 }
 
 function dateChanged() {
-  var dateFormat = d3.time.format("%Y-%m-%d");
   var startDate = document.getElementById("start-date").value;
   var endDate = document.getElementById("end-date").value;
   if (validateDate(startDate) && validateDate(endDate)) {
-    parcoords.data([]).render();
+    parcoords
+      .dimensions({})
+      .data([])
+      .render();
     this.tr.remove();
     dc.redrawAll();
-    d3.queue()
-      .defer(d3.json,
-        "http://83.212.100.48:5000/transactions?start_date=" + startDate + "&end_date=" + endDate)
-      .await(function(error, data) {
-        if (error) throw error;
-        formatData(data);
-        parcoords.data(data).render();
-        this.tr.add(data);
-        setupInputRange();
-        ppaChart
-          .x(d3.time.scale().domain(
-            [d3.time.day.offset(dateFormat.parse(startDate), -1),
-            d3.time.day.offset(dateFormat.parse(endDate), 1)]));
-        dc.redrawAll();
-      });
+    getTransactions(startDate, endDate, updateData)
   }
+}
+
+function updateData(data, startDate, endDate) {
+  var dateFormat = d3.time.format("%Y-%m-%d");
+  formatData(data);
+  parcoords
+    .data(data)
+    .dimensions(generateParcoordsDimensions())
+    .render()
+    .updateAxes();
+  this.tr.add(data);
+  setupInputRange();
+  ppaChart
+    .x(d3.time.scale().domain(
+      [d3.time.day.offset(dateFormat.parse(startDate), -1),
+      d3.time.day.offset(dateFormat.parse(endDate), 1)]));
+  dc.redrawAll();
 }
 
 function validateDate(date) {
@@ -216,6 +192,19 @@ function highlightProvider(provider) {
     this.parcoords.unhighlight();
     this.transactionsByProvider.filterAll();
   }
+}
+
+function generateParcoordsDimensions() {
+  return {
+    "provider_id": { index: 0, title: "Provider ID" },
+    "transaction_type": { index: 1, title: "Transation Type" },
+    "currency_pair": { index: 2, title: "Currency Pair" },
+    "country": { index: 3, title: "Country" },
+    "date_open": { index: 4, title: "Date Open" },
+    "date_closed": { index: 5, title: "Date Closed" },
+    "amount": { index: 6, title: "Amount (lots)" },
+    "net_pnl": { index: 7, title: "Net PnL ($)" },
+  };
 }
 
 function setupInputRange() {
