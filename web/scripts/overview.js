@@ -15,16 +15,18 @@ var parcoords = d3.parcoords()("#parcoords-overview")
 
 var ppaChart = dc.barChart("#ppa")
   .width(600)
-  .height(400)
+  .height(400);
 
 var currencyCounts = dc.pieChart("#currency-counts")
   .width(400)
   .height(400)
-  .radius(180)
+  .radius(180);
 
 var tradingVolume = dc.lineChart("#trading-volume")
   .width(600)
-  .height(400)
+  .height(400);
+
+var netPNL = dc.numberDisplay("#net-pnl");
 
 function makeGraphs(error, transactions) {
   formatData(transactions);
@@ -79,6 +81,21 @@ function makeGraphs(error, transactions) {
   });
   var transactionsByDateClosedHourlyGroup = transactionsByDateClosedHourly.group()
 
+  var transactionsByPNLGroup = transactionsByID
+    .groupAll().reduce(
+      function(p, v) {
+        p.net_pnl += v.net_pnl;
+        return p;
+      },
+      function(p, v) {
+        p.net_pnl -= v.net_pnl;
+        return p;
+      },
+      function() {
+        return { net_pnl: 0 };
+      }
+    );
+
   var parcoordsDimensions = generateParcoordsDimensions();
 
   parcoords
@@ -120,6 +137,11 @@ function makeGraphs(error, transactions) {
     .elasticY(true)
     .dimension(transactionsByDateClosedHourly)
     .group(transactionsByDateClosedHourlyGroup)
+
+  netPNL
+    .formatNumber(function(d) { return "$ " + d3.format(".2f")(d); })
+    .valueAccessor(function(d) { return d.net_pnl; })
+    .group(transactionsByPNLGroup);
 
   dc.renderAll();
 }
