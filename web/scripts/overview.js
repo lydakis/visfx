@@ -22,6 +22,10 @@ var currencyCounts = dc.pieChart("#currency-counts")
   .height(400)
   .radius(180)
 
+var tradingVolume = dc.lineChart("#trading-volume")
+  .width(600)
+  .height(400)
+
 function makeGraphs(error, transactions) {
   formatData(transactions);
 
@@ -41,7 +45,6 @@ function makeGraphs(error, transactions) {
       (+d.date_closed.getMonth() + 1) + "-" +
       d.date_closed.getDate());
   });
-
   var transactionsByDateClosedGroup = transactionsByDateClosed
     .group()
     .reduce(
@@ -65,8 +68,16 @@ function makeGraphs(error, transactions) {
   var transactionsByCurrency = tr.dimension(function(d) {
     return d.currency_pair;
   });
-
   var transactionsByCurrencyGroup = transactionsByCurrency.group();
+
+  var transactionsByDateClosedHourly = tr.dimension(function(d) {
+    return d3.time.format("%Y-%m-%dT%H").parse(
+      d.date_closed.getFullYear() + "-" +
+      (+d.date_closed.getMonth() + 1) + "-" +
+      d.date_closed.getDate() + "T" +
+      d.date_closed.getHours());
+  });
+  var transactionsByDateClosedHourlyGroup = transactionsByDateClosedHourly.group()
 
   var parcoordsDimensions = generateParcoordsDimensions();
 
@@ -86,21 +97,29 @@ function makeGraphs(error, transactions) {
     .dimension(transactionsByDateClosed)
     .group(transactionsByDateClosedGroup)
     .valueAccessor(function(d) { return +d.value.ppa; })
-    .x(d3.time.scale().domain([new Date(2015, 3, 30), new Date(2015, 4, 8)]))
+    .x(d3.time.scale().domain([new Date(2015, 4, 1), new Date(2015, 4, 7)]))
     .renderHorizontalGridLines(true)
     .brushOn(true)
     .clipPadding(10)
     .elasticY(true)
-    .centerBar(true)
     .gap(10)
     .xUnits(d3.time.days)
-    .round(dc.round.floor)
-    .alwaysUseRounding(true)
-    .yAxisLabel('Net PNL per Amount');
+    .yAxisLabel("Net PNL per Amount");
 
   currencyCounts
     .dimension(transactionsByCurrency)
     .group(transactionsByCurrencyGroup);
+
+  tradingVolume
+    .margins({ top: 24, left: 60, bottom: 20, right: 0 })
+    .x(d3.time.scale().domain([new Date(2015, 4, 1), new Date(2015, 4, 7)]))
+    .interpolate("bundle")
+    .brushOn(true)
+    .yAxisLabel("Trading Volume")
+    .clipPadding(10)
+    .elasticY(true)
+    .dimension(transactionsByDateClosedHourly)
+    .group(transactionsByDateClosedHourlyGroup)
 
   dc.renderAll();
 }
@@ -172,8 +191,10 @@ function updateData(data, startDate, endDate) {
   setupInputRange();
   ppaChart
     .x(d3.time.scale().domain(
-      [d3.time.day.offset(dateFormat.parse(startDate), -1),
-      d3.time.day.offset(dateFormat.parse(endDate), 1)]));
+      [dateFormat.parse(startDate), dateFormat.parse(endDate)]));
+  tradingVolume
+    .x(d3.time.scale().domain(
+      [dateFormat.parse(startDate), dateFormat.parse(endDate)]));
   dc.redrawAll();
 }
 
@@ -197,9 +218,9 @@ function highlightProvider(provider) {
 function generateParcoordsDimensions() {
   return {
     "provider_id": { index: 0, title: "Provider ID" },
-    "transaction_type": { index: 1, title: "Transation Type" },
-    "currency_pair": { index: 2, title: "Currency Pair" },
-    "country": { index: 3, title: "Country" },
+    "country": { index: 1, title: "Country" },
+    "transaction_type": { index: 2, title: "Transation Type" },
+    "currency_pair": { index: 3, title: "Currency Pair" },
     "date_open": { index: 4, title: "Date Open" },
     "date_closed": { index: 5, title: "Date Closed" },
     "amount": { index: 6, title: "Amount (lots)" },
