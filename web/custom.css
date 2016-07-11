@@ -6,3 +6,11 @@ text {
   font-family: sans-serif;
   font-size: 8px;
 }
+
+a {
+  background-color: black;
+}
+
+a:hover {
+  text-decoration: underline;
+}
