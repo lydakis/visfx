@@ -4,7 +4,7 @@ var ES_HOST = {
 
 var client = elasticsearch.Client(ES_HOST);
 
-var getTransactions = function(startDate, endDate, callback) {
+function getTransactions(startDate, endDate, callback) {
   var docs = [];
   var query = {
     query: {

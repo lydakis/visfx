@@ -13,6 +13,7 @@
     <script src="lib/js/d3.parcoords.js" type="text/javascript"></script>
     <script src="lib/js/d3-queue.v3.min.js" type="text/javascript"></script>
     <script src="lib/js/d3.svg.multibrush.js" type="text/javascript"></script>
+    <script src="lib/js/d3.radarchart.js" type="text/javascript"></script>
 
     <link href="custom.css" rel="stylesheet">
     <link href="lib/css/bootstrap.css" rel="stylesheet">
@@ -38,8 +39,14 @@
         <input id="end-date" type="text" placeholder="yyyy-MM-dd" value="2015-05-07">
         <input type="submit" value="Submit">
       </form>
+      <br>
+      <div id="radar-overview" style="width:900;margin-left:200px;height:500;"></div>
+      <br>
+      <span>Select Provider ID: </span><span id="provider-value">All</em></span>
+      <input id="provider-range" type="range" value="0" oninput="rangeChanged()">
     </div>
 
     <script src="scripts/es.js" type="text/javascript"></script>
+    <script src="scripts/features.js" type="text/javascript"></script>
   </body>
 </html>
