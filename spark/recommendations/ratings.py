@@ -83,14 +83,14 @@ def generate_features(rdd):
         pnl_per_amount(total_pair_pnl_rdd, total_pair_amount_rdd)
     return {
         'pair_counts': normalize_feature(count_rdd),
-        'net_amount': normalize_feature(amount_rdd),
-        'net_pair_pnl': normalize_feature(pnl_rdd),
+        'total_amount': normalize_feature(amount_rdd),
+        'total_pair_pnl': normalize_feature(pnl_rdd),
         'pnl_per_amount': normalize_feature(pnl_per_amount_rdd),
         'provider_pnl': normalize_feature(provider_pnl_rdd),
         'provider_amount': normalize_feature(provider_amount_rdd),
         'provider_pnl_per_amount': normalize_feature(
             provider_pnl_per_amount_rdd),
-        'net_pair_count': normalize_feature(total_pair_count_rdd),
+        'total_pair_count': normalize_feature(total_pair_count_rdd),
         'pair_amount': normalize_feature(total_pair_amount_rdd),
         'pair_pnl': normalize_feature(total_pair_pnl_rdd),
         'pair_pnl_per_amount': normalize_feature(total_pair_pnl_per_amount_rdd)
@@ -110,13 +110,13 @@ def canonicalize_keys(feature, keys, provider=False, currency_pair=False):
 def generate_weights():
     return {
         'pair_counts': 1.0,
-        'net_amount': 1.0,
-        'net_pair_pnl': 1.0,
+        'total_amount': 1.0,
+        'total_pair_pnl': 1.0,
         'pnl_per_amount': 1.0,
         'provider_pnl': 1.0,
         'provider_amount': 1.0,
         'provider_pnl_per_amount': 1.0,
-        'net_pair_count': 1.0,
+        'total_pair_count': 1.0,
         'pair_amount': 1.0,
         'pair_pnl': 1.0,
         'pair_pnl_per_amount': 1.0
@@ -137,7 +137,7 @@ def format_pca(ratings, keys):
     keys = keys.zipWithIndex().map(lambda x: (x[1], x[0]))
     return keys.join(ratings) \
         .map(lambda x: x[1]) \
-        .map(lambda item: (item[0][0], {
+        .map(lambda item: ((item[0][0], item[0][1]), {
             'provider_id': item[0][0],
             'currency_pair': item[0][1],
             'rating': item[1]
@@ -206,8 +206,8 @@ if __name__ == '__main__':
     sc = SparkContext(conf=conf)
 
     start_date, end_date = parse_dates('2015-05-01', '7d')
-    es_rdd = get_es_rdd(sc, index='forex/transaction', date_field='date_closed',
+    rdd = get_es_rdd(sc, index='forex/transaction', date_field='date_closed',
         start_date=start_date, end_date=end_date) \
             .persist(StorageLevel.MEMORY_AND_DISK)
-    ratings = get_ratings(sc, es_rdd, pca, '2015-05-01', '7d')
+    ratings = get_ratings(sc, rdd, pca, '2015-05-01', '7d')
     save_ratings(ratings, 'forex/rating', 'rating_id')
