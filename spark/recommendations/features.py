@@ -213,7 +213,7 @@ def format_features(features, start_date, end_date):
     for feature in features:
         agg_features = feature.join(agg_features) \
             .map(lambda (key, ((name, value), body)):
-                (key, modify_record(body, {
+                (key, modify_record(body, append={
                     name: value
                 })))
     return agg_features.map(lambda (key, body): (make_key(key), body))
