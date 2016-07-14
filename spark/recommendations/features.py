@@ -200,7 +200,7 @@ def generate_features(rdd):
 def format_features(features, start_date, end_date):
     agg_features = features.pop()
     agg_features = agg_features.map(lambda (key, (name, value)):
-            (key,
+            (make_key(key),
                 {
                     'provider_id': key[0],
                     'currency_pair': key[1],
@@ -211,12 +211,14 @@ def format_features(features, start_date, end_date):
                     name: value
                 }))
     for feature in features:
-        agg_features = feature.join(agg_features) \
+        agg_features = feature \
+            .map(lambda (key, body): (make_key(key), body)) \
+            .join(agg_features) \
             .map(lambda (key, ((name, value), body)):
                 (key, modify_record(body, append={
                     name: value
                 })))
-    return agg_features.map(lambda (key, body): (make_key(key), body))
+    return agg_features
 
 def fix_keys(rdd, feature, name, kind):
     keys = get_keys(rdd)
