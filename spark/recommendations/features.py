@@ -197,29 +197,6 @@ def generate_features(rdd):
             l_trade_count_rdd, l_amount_rdd, l_net_pnl_rdd, \
             l_trade_duration_rdd, l_trade_duration_rdd]
 
-def format_features(features, start_date, end_date):
-    agg_features = features.pop()
-    agg_features = agg_features.map(lambda (key, (name, value)):
-            (make_key(key),
-                {
-                    'provider_id': key[0],
-                    'currency_pair': key[1],
-                    'transaction_type': key[2],
-                    'country': key[3],
-                    'start_date': start_date,
-                    'end_date': end_date,
-                    name: value
-                }))
-    for feature in features:
-        agg_features = feature \
-            .map(lambda (key, body): (make_key(key), body)) \
-            .join(agg_features) \
-            .map(lambda (key, ((name, value), body)):
-                (key, modify_record(body, append={
-                    name: value
-                })))
-    return agg_features
-
 def fix_keys(rdd, feature, name, kind):
     keys = get_keys(rdd)
     if 'pc' == kind:
@@ -229,8 +206,17 @@ def fix_keys(rdd, feature, name, kind):
             .join(feature) \
             .map(lambda ((
                 provider_id, currency_pair, transaction_type), (country, value)):
-                    ((provider_id, currency_pair, transaction_type, country),
-                        (name, value)))
+                    (make_key((provider_id, currency_pair, transaction_type, country)),
+                        {
+                            'feature_id': make_key((provider_id, currency_pair, transaction_type, country)),
+                            'provider_id': provider_id,
+                            'currency_pair': currency_pair,
+                            'transaction_type': transaction_type,
+                            'country': country,
+                            'start_date': start_date,
+                            'end_date': end_date,
+                            name: value
+                        }))
     elif 'p' == kind:
         return keys \
             .map(lambda (provider_id, currency_pair, transaction_type, country):
@@ -238,8 +224,17 @@ def fix_keys(rdd, feature, name, kind):
             .join(feature) \
             .map(lambda (
                 provider_id, ((currency_pair, transaction_type, country), value)):
-                    ((provider_id, currency_pair, transaction_type, country),
-                        (name, value)))
+                    (make_key((provider_id, currency_pair, transaction_type, country)),
+                        {
+                            'feature_id': make_key((provider_id, currency_pair, transaction_type, country)),
+                            'provider_id': provider_id,
+                            'currency_pair': currency_pair,
+                            'transaction_type': transaction_type,
+                            'country': country,
+                            'start_date': start_date,
+                            'end_date': end_date,
+                            name: value
+                        }))
     elif 'c' == kind:
         return keys \
             .map(lambda (provider_id, currency_pair, transaction_type, country):
@@ -247,8 +242,17 @@ def fix_keys(rdd, feature, name, kind):
             .join(feature) \
             .map(lambda
                 ((currency_pair, transaction_type), ((provider_id, country), value)):
-                    ((provider_id, currency_pair, transaction_type, country),
-                        (name, value)))
+                    (make_key((provider_id, currency_pair, transaction_type, country)),
+                        {
+                            'feature_id': make_key((provider_id, currency_pair, transaction_type, country)),
+                            'provider_id': provider_id,
+                            'currency_pair': currency_pair,
+                            'transaction_type': transaction_type,
+                            'country': country,
+                            'start_date': start_date,
+                            'end_date': end_date,
+                            name: value
+                        }))
     elif 'l' == kind:
         return keys \
             .map(lambda (provider_id, currency_pair, transaction_type, country):
@@ -257,7 +261,16 @@ def fix_keys(rdd, feature, name, kind):
             .map(lambda
                 (country, ((provider_id, currency_pair, transaction_type), value)):
                     ((provider_id, currency_pair, transaction_type, country),
-                        (name, value)))
+                        {
+                            'feature_id': make_key((provider_id, currency_pair, transaction_type, country)),
+                            'provider_id': provider_id,
+                            'currency_pair': currency_pair,
+                            'transaction_type': transaction_type,
+                            'country': country,
+                            'start_date': start_date,
+                            'end_date': end_date,
+                            name: value
+                        }))
     else:
         raise
 
@@ -300,5 +313,5 @@ if __name__ == '__main__':
             .persist(StorageLevel.MEMORY_AND_DISK)
 
     features = generate_features(rdd)
-    formated_features = format_features(features, start_date, end_date)
-    save_es_rdd(formated_features, 'forex/feature')
+    for feature in features:
+        save_es_rdd(feature, 'forex/test', key='feature_id', upsert=True)

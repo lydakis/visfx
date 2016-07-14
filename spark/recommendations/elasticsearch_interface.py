@@ -25,10 +25,11 @@ def es_read_conf(
         }'''
     return conf
 
-def es_write_conf(index, key=None):
+def es_write_conf(index, key=None, upsert=False):
     conf = {
         'es.nodes': 'search',
         'es.port': '9200',
+        'es.write.operation': 'upsert' if upsert else 'index',
         'es.resource': index
     }
     if key != None:
@@ -43,13 +44,13 @@ def get_es_rdd(
         valueClass='org.elasticsearch.hadoop.mr.LinkedMapWritable',
         conf=es_read_conf(index, query, date_field, start_date, end_date))
 
-def save_es_rdd(rdd, index, key=None):
+def save_es_rdd(rdd, index, key=None, upsert=False):
     rdd.saveAsNewAPIHadoopFile(
         path='-',
         outputFormatClass="org.elasticsearch.hadoop.mr.EsOutputFormat",
         keyClass="org.apache.hadoop.io.NullWritable",
         valueClass="org.elasticsearch.hadoop.mr.LinkedMapWritable",
-        conf=es_write_conf(index, key))
+        conf=es_write_conf(index, key, upsert))
 
 def get_currency_pair_dict(sc):
     return dict(get_es_rdd(sc, 'forex/currency_pair') \
