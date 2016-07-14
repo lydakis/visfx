@@ -199,7 +199,7 @@ def generate_features(rdd):
 
 def format_features(features, start_date, end_date):
     agg_features = features.pop()
-    agg_features.map(lambda (key, (name, value)):
+    agg_features = agg_features.map(lambda (key, (name, value)):
             (key,
                 {
                     'provider_id': key[0],
