@@ -305,7 +305,7 @@ start_date = '2015-05-01'
 end_date = '2015-05-07'
 
 if __name__ == '__main__':
-    conf = SparkConf().setAppName('Compute Currency Ratings')
+    conf = SparkConf().setAppName('Compute Features')
     sc = SparkContext(conf=conf)
 
     rdd = get_es_rdd(sc, index='forex/transaction', date_field='date_closed',
@@ -314,4 +314,4 @@ if __name__ == '__main__':
 
     features = generate_features(rdd)
     for feature in features:
-        save_es_rdd(feature, 'forex/test', key='feature_id', upsert=True)
+        save_es_rdd(feature, 'forex/feature', key='feature_id', upsert=True)
