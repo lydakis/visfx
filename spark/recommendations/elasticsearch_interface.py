@@ -18,7 +18,7 @@ def es_read_conf(
                     "''' + date_field + '''": {
                         "gte": "''' + start_date + '''",
                         "lte": "''' + end_date + '''",
-                        "format": "yyyy-MM-dd'T'HH:mm:ss"
+                        "format": "yyyy-MM-dd"
                     }
                 }
             }
