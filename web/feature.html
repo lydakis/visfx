@@ -40,7 +40,22 @@
         <input type="submit" value="Submit">
       </form>
       <br>
-      <div id="radar-overview" style="width:900;margin-left:200px;height:500;"></div>
+      <div class="row">
+        <div class="col-md-6">
+          <div id="radar-pc" style="width:400;height:300;"><p class="legend">Trade Features</p></div>
+        </div>
+        <div class="col-md-6">
+          <div id="radar-p" style="width:400;height:400;"><p class="legend">Provider Features</p></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div id="radar-c" style="width:400;height:400;"><p class="legend">Currency Pair Features</p></div>
+        </div>
+        <div class="col-md-6">
+          <div id="radar-l" style="width:400;height:400;"><p class="legend">Country Features</p></div>
+        </div>
+      </div>
       <br>
       <span>Select Provider ID: </span><span id="provider-value">All</em></span>
       <input id="provider-range" type="range" value="0" oninput="rangeChanged()">

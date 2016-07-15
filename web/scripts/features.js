@@ -2,15 +2,15 @@ d3.queue()
   .defer(d3.csv, "mock-data/features.csv")
   .await(makeGraphs);
 
-var colors = d3.scale.category20b();
+var colors = d3.scale.category10();
 var color = function(d) { return colors(d.provider_id); };
 
 var radarChartConfig = {
-  w: 600,
-  h: 600,
+  w: 400,
+  h: 400,
   maxValue: 2,
   levels: 10,
-  ExtraWidthX: 300
+  ExtraWidthX: 200
 }
 
 function makeGraphs(error, data) {
@@ -165,9 +165,7 @@ function makeGraphs(error, data) {
     );
 
   setupInputRange()
-  this.r = formatRadarChartData(data, averageFeaturesGroup, null);
-
-  RadarChart.draw("#radar-overview", formatRadarChartData(data, averageFeaturesGroup, null), radarChartConfig);
+  drawRadarCharts();
 }
 
 function formatData(data) {
@@ -200,124 +198,44 @@ function formatData(data) {
   });
 }
 
-function formatRadarChartData(data, averageFeatures, provider) {
-  this.variance = {
-    pc_trade_count: 0,
-    pc_amount: 0,
-    pc_net_pnl: 0,
-    pc_trade_duration: 0,
-    pc_pnl_per_amount: 0,
-    p_trade_count: 0,
-    p_net_pnl: 0,
-    p_amount: 0,
-    p_trade_duration: 0,
-    p_pnl_per_amount: 0,
-    c_trade_count: 0,
-    c_amount: 0,
-    c_net_pnl: 0,
-    c_trade_duration: 0,
-    c_pnl_per_amount: 0,
-    l_trade_count: 0,
-    l_amount: 0,
-    l_net_pnl: 0,
-    l_trade_duration: 0,
-    l_pnl_per_amount: 0
-  };
+function formatRadarChartData(averageFeatures, type) {
   var chartData = [];
-  data.forEach(function(d) {
-    variance.pc_trade_count += Math.pow(d.pc_trade_count - averageFeatures.value().pcTradeCountAvg, 2);
-    variance.pc_amount += Math.pow(d.pc_amount - averageFeatures.value().pcAmountAvg, 2);
-    variance.pc_net_pnl += Math.pow(d.pc_net_pnl - averageFeatures.value().pcNetPNLAvg, 2);
-    variance.pc_trade_duration += Math.pow(d.pc_trade_duration - averageFeatures.value().pcTradeDurationAvg, 2);
-    variance.pc_pnl_per_amount += Math.pow(d.pc_pnl_per_amount - averageFeatures.value().pcPNLPerAmountAvg, 2);
-    variance.p_trade_count += Math.pow(d.p_trade_count - averageFeatures.value().pTradeCountAvg, 2);
-    variance.p_net_pnl += Math.pow(d.p_net_pnl - averageFeatures.value().pNetPNLAvg, 2);
-    variance.p_amount += Math.pow(d.p_amount - averageFeatures.value().pAmountAvg, 2);
-    variance.p_trade_duration += Math.pow(d.p_trade_duration - averageFeatures.value().pTradeDurationAvg, 2);
-    variance.p_pnl_per_amount += Math.pow(d.p_pnl_per_amount - averageFeatures.value().pPNLPerAmountAvg, 2);
-    variance.c_trade_count += Math.pow(d.c_trade_count - averageFeatures.value().cTradeCountAvg, 2);
-    variance.c_amount += Math.pow(d.c_amount - averageFeatures.value().cAmountAvg, 2);
-    variance.c_net_pnl += Math.pow(d.c_net_pnl - averageFeatures.value().cNetPNLAvg, 2);
-    variance.c_trade_duration += Math.pow(d.c_trade_duration - averageFeatures.value().cTradeDurationAvg, 2);
-    variance.c_pnl_per_amount += Math.pow(d.c_pnl_per_amount - averageFeatures.value().cPNLPerAmountAvg, 2);
-    variance.c_trade_count += Math.pow(d.c_trade_count - averageFeatures.value().cTradeCountAvg, 2);
-    variance.l_amount += Math.pow(d.l_amount - averageFeatures.value().lAmountAvg, 2);
-    variance.l_net_pnl += Math.pow(d.l_net_pnl - averageFeatures.value().lNetPNLAvg, 2);
-    variance.l_trade_duration += Math.pow(d.l_trade_duration - averageFeatures.value().lTradeDurationAvg, 2);
-    variance.l_pnl_per_amount += Math.pow(d.l_pnl_per_amount - averageFeatures.value().lPNLPerAmountAvg, 2);
-  });
-  variance.pc_trade_count /= averageFeatures.value().count;
-  variance.pc_amount /= averageFeatures.value().count;
-  variance.pc_net_pnl /= averageFeatures.value().count;
-  variance.pc_trade_duration /= averageFeatures.value().count;
-  variance.pc_pnl_per_amount /= averageFeatures.value().count;
-  variance.p_trade_count /= averageFeatures.value().count;
-  variance.p_net_pnl /= averageFeatures.value().count;
-  variance.p_amount /= averageFeatures.value().count;
-  variance.p_trade_duration /= averageFeatures.value().count;
-  variance.p_pnl_per_amount /= averageFeatures.value().count;
-  variance.c_trade_count /= averageFeatures.value().count;
-  variance.c_amount /= averageFeatures.value().count;
-  variance.c_net_pnl /= averageFeatures.value().count;
-  variance.c_trade_duration /= averageFeatures.value().count;
-  variance.c_pnl_per_amount /= averageFeatures.value().count;
-  variance.l_trade_count /= averageFeatures.value().count;
-  variance.l_amount /= averageFeatures.value().count;
-  variance.l_net_pnl /= averageFeatures.value().count;
-  variance.l_trade_duration /= averageFeatures.value().count;
-  variance.l_pnl_per_amount /= averageFeatures.value().count;
 
-  if (0) {
-    chartData = [
-      [
-        {axis: "Times Pair traded by Provider", value: variance.pc_trade_count},
-        // {axis: "Amount traded from Pair by Provider", value: variance.pc_amount},
-        // {axis: "Total Net PnL from Pair by Provider", value: variance.pc_net_pnl},
-        {axis: "Net PnL per Amount for Pair by Provider", value: variance.pc_pnl_per_amount},
-        {axis: "Average Trade Duration for Pair by Provider", value: variance.pc_trade_duration},
-        {axis: "Number of Trades made by Provider", value: variance.p_trade_count},
-        // {axis: "Provider total Amount traded", value: variance.p_amount},
-        // {axis: "Provider Net PnL", value: variance.p_net_pnl},
-        {axis: "Provider Net PnL per Amount", value: variance.p_pnl_per_amount},
-        {axis: "Provider Average Trade Duration", value: variance.p_trade_duration},
-        {axis: "Times Pair traded in total", value: variance.c_trade_count},
-        // {axis: "Amount Pair traded in total", value: variance.c_amount},
-        // {axis: "Net PnL from Pair in total", value: variance.c_net_pnl},
-        {axis: "Net PnL per Amount for Pair in total", value: variance.c_pnl_per_amount},
-        {axis: "Pair Average Trade Duration", value: variance.c_trade_duration},
-        {axis: "Number of trades by Country", value: variance.l_trade_count},
-        // {axis: "Amount Pair traded in total", value: variance.l_amount},
-        // {axis: "Net PnL from Pair in total", value: variance.l_net_pnl},
-        {axis: "Net PnL per Amount of Country", value: variance.l_pnl_per_amount},
-        {axis: "Average Trade Duration of Country", value: variance.l_trade_duration},
-      ]
-    ];
+  if ("pc" === type) {
+    chartData = [[
+      {axis: "Trade Count", value: averageFeatures.value().pcTradeCountAvg},
+      {axis: "Amount", value: averageFeatures.value().pcAmountAvg},
+      {axis: "Net PnL", value: averageFeatures.value().pcNetPNLAvg},
+      {axis: "Net PnL per Amount", value: averageFeatures.value().pcPNLPerAmountAvg},
+      {axis: "Trade Duration", value: averageFeatures.value().pcTradeDurationAvg}
+    ]];
   }
-  else {
-    chartData = [
-      [
-        {axis: "Times Pair traded by Provider", value: averageFeatures.value().pcTradeCountAvg},
-        // {axis: "Amount traded from Pair by Provider", value: averageFeatures.value().pcAmountAvg},
-        // {axis: "Total Net PnL from Pair by Provider", value: averageFeatures.value().pcNetPNLAvg},
-        {axis: "Net PnL per Amount for Pair by Provider", value: averageFeatures.value().pcPNLPerAmountAvg},
-        {axis: "Average Trade Duration for Pair by Provider", value: averageFeatures.value().pcTradeDurationAvg},
-        {axis: "Number of Trades made by Provider", value: averageFeatures.value().pTradeCountAvg},
-        // {axis: "Provider Net PnL", value: averageFeatures.value().pNetPNLAvg},
-        // {axis: "Provider total Amount traded", value: averageFeatures.value().pAmountAvg},
-        {axis: "Provider Net PnL per Amount", value: averageFeatures.value().pPNLPerAmountAvg},
-        {axis: "Provider Average Trade Duration", value: averageFeatures.value().pcTradeDurationAvg},
-        {axis: "Times Pair traded in total", value: averageFeatures.value().cTradeCountAvg},
-        // {axis: "Amount Pair traded in total", value: averageFeatures.value().cAmountAvg},
-        // {axis: "Net PnL from Pair in total", value: averageFeatures.value().cNetPNLAvg},
-        {axis: "Net PnL per Amount for Pair in total", value: averageFeatures.value().cPNLPerAmountAvg},
-        {axis: "Pair Average Trade Duration", value: averageFeatures.value().cTradeDurationAvg},
-        {axis: "Number of trades by Country", value: averageFeatures.value().lTradeCountAvg},
-        // {axis: "Amount Pair traded in total", value: averageFeatures.value().lAmountAvg},
-        // {axis: "Net PnL from Pair in total", value: averageFeatures.value().lNetPNLAvg},
-        {axis: "Net PnL per Amount of Country", value: averageFeatures.value().lPNLPerAmountAvg},
-        {axis: "Average Trade Duration of Country", value: averageFeatures.value().lTradeDurationAvg},
-      ]
-    ];
+  else if ("p" === type) {
+    chartData = [[
+      {axis: "Trade Count", value: averageFeatures.value().pTradeCountAvg},
+      {axis: "Amount", value: averageFeatures.value().pNetPNLAvg},
+      {axis: "Net PnL", value: averageFeatures.value().pAmountAvg},
+      {axis: "Net PnL per Amount", value: averageFeatures.value().pPNLPerAmountAvg},
+      {axis: "Trade Duration", value: averageFeatures.value().pcTradeDurationAvg}
+      ]];
+  }
+  else if ("c" === type) {
+    chartData = [[
+      {axis: "Trade Count", value: averageFeatures.value().cTradeCountAvg},
+      {axis: "Amount", value: averageFeatures.value().cAmountAvg},
+      {axis: "Net PnL", value: averageFeatures.value().cNetPNLAvg},
+      {axis: "Net PnL per Amount", value: averageFeatures.value().cPNLPerAmountAvg},
+      {axis: "Trade Duration", value: averageFeatures.value().cTradeDurationAvg}
+    ]];
+  }
+  else if ("l" === type) {
+    chartData = [[
+      {axis: "Trade Count", value: averageFeatures.value().lTradeCountAvg},
+      {axis: "Amount", value: averageFeatures.value().lAmountAvg},
+      {axis: "Net PnL", value: averageFeatures.value().lNetPNLAvg},
+      {axis: "Net PnL per Amount", value: averageFeatures.value().lPNLPerAmountAvg},
+      {axis: "Trade Duration", value: averageFeatures.value().lTradeDurationAvg}
+    ]]
   }
 
   return chartData;
@@ -330,15 +248,24 @@ function rangeChanged() {
     providerPair = this.featuresByProviderByPair.group().orderNatural().all()[providerRange.value - 1].key;
     value.innerHTML = providerPair;
     this.featuresByProviderByPair.filter(providerPair);
-    radarChartConfig.maxValue = 2;
-    RadarChart.draw("#radar-overview", formatRadarChartData(this.data, this.averageFeaturesGroup, providerPair), radarChartConfig);
+    drawRadarCharts();
   }
   else {
     value.innerHTML = "All";
     this.featuresByProviderByPair.filterAll();
-    radarChartConfig.maxValue = 0.0000000000001;
-    RadarChart.draw("#radar-overview", formatRadarChartData(this.data, this.averageFeaturesGroup, null), radarChartConfig);
+    drawRadarCharts();
   }
+}
+
+function drawRadarCharts() {
+  radarChartConfig.color = colors(1)
+  RadarChart.draw("#radar-pc", formatRadarChartData(this.averageFeaturesGroup, 'pc'), radarChartConfig);
+  radarChartConfig.color = colors(2)
+  RadarChart.draw("#radar-p", formatRadarChartData(this.averageFeaturesGroup, 'p'), radarChartConfig);
+  radarChartConfig.color = colors(3)
+  RadarChart.draw("#radar-c", formatRadarChartData(this.averageFeaturesGroup, 'c'), radarChartConfig);
+  radarChartConfig.color = colors(4)
+  RadarChart.draw("#radar-l", formatRadarChartData(this.averageFeaturesGroup, 'l'), radarChartConfig);
 }
 
 function setupInputRange() {

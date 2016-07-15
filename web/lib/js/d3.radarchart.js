@@ -29,7 +29,7 @@ var RadarChart = {
   var allAxis = (d[0].map(function(i, j){return i.axis}));
   var total = allAxis.length;
   var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
-  var Format = d3.format('%');
+  var Format = function(d) { return d3.format('.1f')(+d - 1); };
   d3.select(id).select("svg").remove();
 
   var g = d3.select(id)
@@ -122,7 +122,7 @@ var RadarChart = {
            .append("polygon")
            .attr("class", "radar-chart-serie"+series)
            .style("stroke-width", "2px")
-           .style("stroke", cfg.color(series))
+           .style("stroke", cfg.color)
            .attr("points",function(d) {
              var str="";
              for(var pti=0;pti<d.length;pti++){
@@ -130,7 +130,7 @@ var RadarChart = {
              }
              return str;
             })
-           .style("fill", function(j, i){return cfg.color(series)})
+           .style("fill", function(j, i){return cfg.color})
            .style("fill-opacity", cfg.opacityArea)
            .on('mouseover', function (d){
                     z = "polygon."+d3.select(this).attr("class");
@@ -169,7 +169,7 @@ var RadarChart = {
       return cfg.h/2*(1-(Math.max(j.value, 0)/cfg.maxValue)*cfg.factor*Math.cos(i*cfg.radians/total));
     })
     .attr("data-id", function(j){return j.axis})
-    .style("fill", cfg.color(series)).style("fill-opacity", .9)
+    .style("fill", cfg.color).style("fill-opacity", .9)
     .on('mouseover', function (d){
           newX =  parseFloat(d3.select(this).attr('cx')) - 10;
           newY =  parseFloat(d3.select(this).attr('cy')) - 5;
