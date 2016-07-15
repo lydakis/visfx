@@ -17,6 +17,9 @@ def parse_dates(end_date, daterange):
     start_date = end_date - parse_range(daterange)
     return start_date.isoformat(), end_date.isoformat()
 
-def modify_record(record, append):
-    record.update(append)
+def modify_record(record, append=None, update=None):
+    if append != None:
+        record.update(append)
+    if update != None:
+        record[update[0]] = update[1]
     return record

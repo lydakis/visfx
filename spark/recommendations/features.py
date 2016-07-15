@@ -134,19 +134,6 @@ def l_trade_duration(rdd):
              lambda x, y: (x[0] + y[0], x[1] + y[1])) \
         .map(lambda (key, (value_sum, count)): (key, value_sum / count))
 
-def normalize_feature(rdd, mean_normalization=False):
-    max_value = rdd.map(lambda (_, value): value).max()
-    min_value = rdd.map(lambda (_, value): value).min()
-    count = rdd.count()
-    average = rdd \
-        .map(lambda (_, value): value) \
-        .reduce(lambda a, b: a + b) / float(count)
-    return rdd.map(
-        lambda (_, value): (value,
-            float(value - average / (max_value - min_value)
-                if mean_normalization else
-                    value - min_value / (max_value - min_value))))
-
 def generate_features(rdd):
     pc_trade_count_rdd = \
         fix_keys(rdd, pc_trade_count(rdd), 'pc_trade_count', 'pc')
@@ -195,12 +182,24 @@ def generate_features(rdd):
             p_pnl_per_amount_rdd, c_trade_count_rdd, c_amount_rdd, \
             c_net_pnl_rdd, c_trade_duration_rdd, c_pnl_per_amount_rdd, \
             l_trade_count_rdd, l_amount_rdd, l_net_pnl_rdd, \
-            l_trade_duration_rdd, l_trade_duration_rdd]
+            l_pnl_per_amount_rdd, l_trade_duration_rdd, l_trade_duration_rdd]
+
+def normalize_feature(rdd, name):
+    max_value = rdd.map(lambda (_, body): body[name]).max()
+    min_value = rdd.map(lambda (_, body): body[name]).min()
+    count = rdd.count()
+    average = rdd \
+        .map(lambda (_, body): body[name]) \
+        .reduce(lambda a, b: a + b) / float(count)
+    return rdd.map(lambda (key, body):
+        (key, modify_record(body,
+            update=(name,
+                float(body[name] - average) / (max_value - min_value)))))
 
 def fix_keys(rdd, feature, name, kind):
     keys = get_keys(rdd)
     if 'pc' == kind:
-        return keys \
+        return normalize_feature(keys \
             .map(lambda (provider_id, currency_pair, transaction_type, country):
                 ((provider_id, currency_pair, transaction_type), country)) \
             .join(feature) \
@@ -216,9 +215,9 @@ def fix_keys(rdd, feature, name, kind):
                             'start_date': start_date,
                             'end_date': end_date,
                             name: value
-                        }))
+                        })), name)
     elif 'p' == kind:
-        return keys \
+        return normalize_feature(keys \
             .map(lambda (provider_id, currency_pair, transaction_type, country):
                 (provider_id, (currency_pair, transaction_type, country))) \
             .join(feature) \
@@ -234,9 +233,9 @@ def fix_keys(rdd, feature, name, kind):
                             'start_date': start_date,
                             'end_date': end_date,
                             name: value
-                        }))
+                        })), name)
     elif 'c' == kind:
-        return keys \
+        return normalize_feature(keys \
             .map(lambda (provider_id, currency_pair, transaction_type, country):
                 ((currency_pair, transaction_type), (provider_id, country))) \
             .join(feature) \
@@ -252,9 +251,9 @@ def fix_keys(rdd, feature, name, kind):
                             'start_date': start_date,
                             'end_date': end_date,
                             name: value
-                        }))
+                        })), name)
     elif 'l' == kind:
-        return keys \
+        return normalize_feature(keys \
             .map(lambda (provider_id, currency_pair, transaction_type, country):
                 (country, (provider_id, currency_pair, transaction_type))) \
             .join(feature) \
@@ -270,7 +269,7 @@ def fix_keys(rdd, feature, name, kind):
                             'start_date': start_date,
                             'end_date': end_date,
                             name: value
-                        }))
+                        })), name)
     else:
         raise
 
