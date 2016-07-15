@@ -15,10 +15,28 @@ var radarChartConfig = {
 
 function makeGraphs(error, data) {
   formatData(data);
-  this.ft = crossfilter(data);
   this.data = data;
-  this.featuresByProviderByPair = ft.dimension(function(d) {
-    return d.country + " " + d.provider_id + " " + d.transaction_type + " " + d.currency_pair;
+  this.ft = crossfilter(data);
+
+  this.featuresByTrade = ft.dimension(function(d) {
+    return d.provider_id + " " + d.country + " " + d.transaction_type + " " +
+      d.currency_pair;
+  })
+
+  this.featuresByProvider = ft.dimension(function(d) {
+    return d.provider_id;
+  });
+
+  this.featuresByCurrency = ft.dimension(function(d) {
+    return d.currency_pair;
+  });
+
+  this.featuresByType = ft.dimension(function(d) {
+    return d.transaction_type;
+  });
+
+  this.featuresByCountry = ft.dimension(function(d) {
+    return d.country;
   });
 
   this.averageFeaturesGroup = this.ft.dimension(function(d) {
@@ -164,7 +182,8 @@ function makeGraphs(error, data) {
       }
     );
 
-  setupInputRange()
+  setupInputRange();
+  updateSelections(true);
   drawRadarCharts();
 }
 
@@ -242,19 +261,39 @@ function formatRadarChartData(averageFeatures, type) {
 }
 
 function rangeChanged() {
-  var providerRange = document.getElementById("provider-range");
-  var value = document.getElementById("provider-value");
+  var providerRange = document.getElementById("trade-range");
+  var value = document.getElementById("trade-value");
   if ("0" !== providerRange.value) {
-    providerPair = this.featuresByProviderByPair.group().orderNatural().all()[providerRange.value - 1].key;
+    providerPair = this.featuresByTrade.group().orderNatural().all()[providerRange.value - 1].key;
     value.innerHTML = providerPair;
-    this.featuresByProviderByPair.filter(providerPair);
+    this.featuresByTrade.filter(providerPair);
     drawRadarCharts();
   }
   else {
     value.innerHTML = "All";
-    this.featuresByProviderByPair.filterAll();
+    this.featuresByTrade.filterAll();
     drawRadarCharts();
   }
+}
+
+function changeSelection(selection) {
+  var providerSelection = document.getElementById("provider-selection");
+  var countrySelection = document.getElementById("country-selection");
+  var typeSelection = document.getElementById("type-selection");
+  var currencySelection = document.getElementById("currency-selection");
+  console.log("here!");
+  this.featuresByProvider.filter(
+    providerSelection.value !== "All" ? +providerSelection.value : null);
+  this.featuresByCountry.filter(
+    countrySelection.value !== "All" ? countrySelection.value : null);
+  this.featuresByType.filter(
+    typeSelection.value !== "All" ? typeSelection.value : null);
+  this.featuresByCurrency.filter(
+    currencySelection.value !== "All" ? currencySelection.value : null);
+
+  // emptySelections(selection);
+  // updateSelections(false);
+  drawRadarCharts();
 }
 
 function drawRadarCharts() {
@@ -269,6 +308,80 @@ function drawRadarCharts() {
 }
 
 function setupInputRange() {
-  document.getElementById("provider-range")
-    .setAttribute("max", this.featuresByProviderByPair.group().size());
+  document.getElementById("trade-range")
+    .setAttribute("max", this.featuresByTrade.group().size());
+}
+
+function updateSelections(first) {
+  var providerSelection = document.getElementById("provider-selection");
+  var countrySelection = document.getElementById("country-selection");
+  var typeSelection = document.getElementById("type-selection");
+  var currencySelection = document.getElementById("currency-selection");
+
+  if (first) {
+    var pAll = document.createElement("option");
+    pAll.text = "All";
+    providerSelection.add(pAll);
+    var lAll = document.createElement("option");
+    lAll.text = "All";
+    countrySelection.add(lAll);
+    var tAll = document.createElement("option");
+    tAll.text = "All";
+    typeSelection.add(tAll);
+    var cAll = document.createElement("option");
+    cAll.text = "All";
+    currencySelection.add(cAll);
+  }
+  this.featuresByProvider.group().orderNatural().all().forEach(function(d) {
+    var option = document.createElement("option");
+    option.text = d.key;
+    providerSelection.add(option);
+  });
+  this.featuresByCountry.group().orderNatural().all().forEach(function(d) {
+    var option = document.createElement("option");
+    option.text = d.key;
+    countrySelection.add(option);
+  });
+  this.featuresByType.group().orderNatural().all().forEach(function(d) {
+    var option = document.createElement("option");
+    option.text = d.key;
+    typeSelection.add(option);
+  });
+  this.featuresByCurrency.group().orderNatural().all().forEach(function(d) {
+    var option = document.createElement("option");
+    option.text = d.key;
+    currencySelection.add(option);
+  });
+}
+
+function emptySelections(selection) {
+  var providerSelection = document.getElementById("provider-selection");
+  var countrySelection = document.getElementById("country-selection");
+  var typeSelection = document.getElementById("type-selection");
+  var currencySelection = document.getElementById("currency-selection");
+
+  if (selection !== providerSelection) {
+    var length = providerSelection.options.length;
+    for (var i = 1; i < length; i++) {
+      providerSelection.remove(i);
+    }
+  }
+  if (selection !== countrySelection) {
+    var length = countrySelection.options.length;
+    for (var i = 1; i < length; i++) {
+      countrySelection.remove(i);
+    }
+  }
+  if (selection !== typeSelection) {
+    var length = typeSelection.options.length;
+    for (var i = 1; i < length; i++) {
+      typeSelection.remove(i);
+    }
+  }
+  if (selection !== currencySelection) {
+    var length = currencySelection.options.length;
+    for (var i = 1; i < length; i++) {
+      currencySelection.remove(i);
+    }
+  }
 }

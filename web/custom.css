@@ -23,3 +23,11 @@ text {
   height: 300px;
   line-height: normal;
 }
+
+select {
+  width: 180px;
+}
+
+.col-half-offset{
+    margin-left:4.166666667%
+}
