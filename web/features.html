@@ -81,7 +81,161 @@
           <div id="radar-l" style="width:400;height:400;"><p class="legend">Country Features</p></div>
         </div>
       </div>
+      <h4>Pseudo-ratings</h4>
+      <p>
+        In order to train the Recommender we need to compute pseudo-ratings
+        from the implicit feedback we have collected and calculated (features above).
+        Each rating will be comprised of 4 components; a Trade specific, a Provider specific,
+        a Currency Pair specific, and a Country specific component. These are going to be
+        combined with different weights depending the effect we want the to have upon the final ratings.
+      </p>
       <br>
+      <div class="row">
+        <div class="col-md-3">
+          <p><u>Trade Features</u></p>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Overall:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Trade Count:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Trade Duration:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Net PnL per Amount:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <p><u>Provider Features</u></p>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Overall:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Trade Count:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Trade Duration:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Net PnL per Amount:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <p><u>Currency Pair Features</u></p>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Overall:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Trade Count:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Trade Duration:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Net PnL per Amount:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <p><u>Country Features</u></p>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Overall:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Trade Count:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Trade Duration:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <span>Net PnL per Amount:</span>
+            </div>
+            <div class="col-md-6">
+              <input class="features" type="text" value="1.0">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="scripts/es.js" type="text/javascript"></script>

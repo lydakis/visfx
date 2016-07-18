@@ -31,3 +31,8 @@ select {
 .col-half-offset{
     margin-left:4.166666667%
 }
+
+.features {
+  width: 80px;
+  text-align: center;
+}
