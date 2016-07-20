@@ -53,6 +53,9 @@ def save_es_rdd(rdd, index, key=None, upsert=False):
         conf=es_write_conf(index, key, upsert))
 
 def get_currency_pair_dict(sc):
-    return dict(get_es_rdd(sc, 'forex/currency_pair') \
-        .map(lambda item:
-            (item[1]['currency_pair'], item[1]['currency_pair_id'])).collect())
+    rdd = get_es_rdd(sc, 'forex/currency_pair')
+    return dict(
+        rdd.map(lambda (_, body):
+                ('BUY ' + body['currency_pair'], 1000 + body['currency_pair_id']))
+        .union(rdd.map(lambda (_, body):
+                ('SELL ' + body['currency_pair'], 2000 + body['currency_pair_id']))).collect())

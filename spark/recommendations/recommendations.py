@@ -6,11 +6,12 @@ from elasticsearch_interface import get_es_rdd, save_es_rdd, \
 from ratings import get_ratings, pca, linear_combination
 from utils import parse_range, parse_dates
 import math
+import json
+import hashlib
 
 def generate_predictions(training_df, prediction_df, rank):
-    seed = 5L
     iterations = 10
-    als = ALS(rank=rank, seed=seed, maxIter=iterations)
+    als = ALS(rank=rank, maxIter=iterations, implicitPrefs=True)
     model = als.fit(training_df)
     return model.transform(prediction_df).dropna()
 
@@ -19,17 +20,17 @@ def compute_model_parameters(ratings):
         ratings.randomSplit([6.0, 2.0, 2.0], seed=0L)
     validation_for_predict_df = validation_df.drop('rating')
     test_for_predict_df = test_df.drop('rating')
-    ranks = [4, 8, 12]
-    errors = [0, 0, 0]
+    ranks = [2, 4, 8, 12]
+    errors = [0, 0, 0, 0]
     err = 0
     min_evaluation_error = float('inf')
     best_rank = -1
     for rank in ranks:
         predictions = \
             generate_predictions(training_df, validation_for_predict_df, rank) \
-                .map(lambda r: ((r[0], r[1]), r[2])).cache()
+                .map(lambda r: ((r[0], r[1]), r[2]))
         rates_and_preds = validation_df \
-            .map(lambda r: ((r[0], r[1]), r[2])).join(predictions)
+            .map(lambda r: ((r[0], r[1]), r[2])).join(sc.parallelize(predictions.collect()))
         evaluation_error = math.sqrt(rates_and_preds \
             .map(lambda r: (r[1][0] - r[1][1])**2).mean())
         errors[err] = evaluation_error
@@ -39,35 +40,29 @@ def compute_model_parameters(ratings):
             best_rank = rank
     predictions = \
         generate_predictions(training_df, test_for_predict_df, best_rank) \
-            .map(lambda r: ((r[0], r[1]), r[2])).cache()
+            .map(lambda r: ((r[0], r[1]), r[2]))
     rates_and_preds = test_df \
         .map(lambda r: ((r[0], r[1]), r[2])).join(predictions)
     test_error = math.sqrt(
         rates_and_preds.map(lambda r: (r[1][0] - r[1][1])**2).mean())
-    return best_rank, min_evaluation_error, test_error
+    return best_rank, errors, test_error
 
 def get_counts_and_averages(ID_and_ratings_tuple):
     nratings = len(ID_and_ratings_tuple[1])
     return ID_and_ratings_tuple[0], \
         (nratings, float(sum(x for x in ID_and_ratings_tuple[1]))/nratings)
 
-def generate_new_user_recommendations(sqlContext,
-    ratings, best_rank, currency_pair_rdd, new_user_id, new_user_ratings):
-    new_user_ratings_df = \
-        sqlContext.createDataFrame(new_user_ratings, ["user", "item", "rating"])
-    complete_data_with_new_ratings_rdd = ratings.unionAll(new_user_ratings_df)
-    new_user_ratings_ids = map(lambda x: x[1], new_user_ratings)
-    new_user_unrated_movies_df = \
-        (currency_pair_rdd
-            .filter(lambda x: x[0] not in new_user_ratings_ids)
-            .map(lambda x: (new_user_id, x[0]))).toDF(["user", "item"])
+def generate_new_user_recommendations(
+        ratings, best_rank, currency_pair_rdd, new_user_id):
+    new_user_unrated_movies_df = currency_pair_rdd.map(lambda (key, value):
+        (new_user_id, key)).toDF(["user", "item"])
     return generate_predictions(
-        complete_data_with_new_ratings_rdd,
+        ratings,
         new_user_unrated_movies_df,
         best_rank)
 
 def get_top_currency_pairs_recommendation(
-    new_user_recommendations_df, currency_pair_rdd, threshold, top_count):
+        new_user_recommendations_df, currency_pair_rdd, threshold, top_count):
     new_user_recommendations_rating_rdd = \
         new_user_recommendations_df.map(lambda x: (int(x[1]), x[2]))
     new_user_recommendations_rating_title_and_count_rdd = \
@@ -82,28 +77,57 @@ def get_top_currency_pairs_recommendation(
         .filter(lambda r: r[2]>=threshold) \
         .takeOrdered(top_count, key=lambda x: -x[1])
 
+def get_country(rdd, provider_id):
+    return str(rdd.filter(lambda (_, body): provider_id == body['provider_id']) \
+        .map(lambda (_, body): body['country']).top(1)[0])
+
+def make_key(key):
+    provider_id, currency_pair, transaction_type, country = key
+    m = hashlib.md5()
+    m.update(
+            str(provider_id) +
+            str(currency_pair) +
+            str(transaction_type) +
+            str(country) +
+            str(start_date) + str(end_date))
+    return m.hexdigest()
+
+start_date = '2015-05-01'
+end_date = '2015-05-07'
+
 if __name__ == '__main__':
     conf = SparkConf().setAppName('Currency Recommendations')
     sc = SparkContext(conf=conf)
     sqlContext = SQLContext(sc)
 
     currency_pair_dict = get_currency_pair_dict(sc)
-    start_date, end_date = parse_dates('2015-05-01', '7d')
-    es_rdd = get_es_rdd(sc, index='forex/transaction', date_field='date_closed',
-        start_date=start_date, end_date=end_date) \
-            .persist(StorageLevel.MEMORY_AND_DISK)
+    query = json.dumps({
+        'query': {
+            'bool': {
+                'must': [
+                    { 'term': { 'start_date': start_date }},
+                    { 'term': { 'end_date': end_date }}
+                ]
+            }
+        }
+    })
 
-    currency_pair_rdd = get_es_rdd(sc, index='forex/currency_pair') \
-        .map(lambda item:
-            (item[1]['currency_pair_id'], item[1]['currency_pair']))
+    rdd = get_es_rdd(sc, query=query, index='forex/rating')
 
-    ratings = get_ratings(sc, es_rdd, pca, '2015-05-01', '7d') \
-        .map(lambda item: (
-            item[1]['provider_id'],
-            currency_pair_dict[item[1]['currency_pair']],
-            item[1]['rating'])).toDF(["user", "item", "rating"]).cache()
+    c_rdd = get_es_rdd(sc, index='forex/currency_pair')
 
-    best_rank, _, _ = compute_model_parameters(ratings)
+    currency_pair_rdd = c_rdd.map(lambda (item):
+            (1000 + item[1]['currency_pair_id'], 'BUY ' + item[1]['currency_pair'])) \
+        .union(c_rdd.map(lambda item:
+                (2000 + item[1]['currency_pair_id'], 'SELL ' + item[1]['currency_pair'])))
+
+    ratings = rdd \
+        .map(lambda (_, body): (
+            body['provider_id'],
+            currency_pair_dict[body['transaction_type'] + ' '  + body['currency_pair']],
+            body['rating'])).toDF(["user", "item", "rating"]).persist(StorageLevel.MEMORY_AND_DISK)
+
+    best_rank, errors, test_error = compute_model_parameters(ratings)
 
     currency_pairs_with_ratings_rdd = (ratings
         .map(lambda x: (x[1], x[2])).groupByKey())
@@ -112,21 +136,43 @@ if __name__ == '__main__':
     currency_pair_rating_counts_rdd = \
         currency_pair_id_with_avg_ratings_rdd.map(lambda x: (x[0], x[1][0]))
 
-    new_user_id = 0
-    new_user_ratings = [
-        (0, 11, -0.27364467534226611),
-        (0, 72, -0.24467350077258987),
-        (0, 47, 0.49944447720095908),
-        (0, 37, -0.28990308363778161)
-    ]
+# new_user_id = 1983448
 
-    new_user_recommendations_df = generate_new_user_recommendations(sqlContext,
-        ratings, best_rank, currency_pair_rdd, new_user_id, new_user_ratings)
+    providers = rdd.map(lambda (_, body): body['provider_id']).collect()
 
-    top_currency_pairs = get_top_currency_pairs_recommendation(
-        new_user_recommendations_df, currency_pair_rdd, 100, 25)
+    for new_user_id in providers:
+        country = get_country(rdd, new_user_id)
+        new_user_recommendations_df = generate_new_user_recommendations(
+            ratings, best_rank, currency_pair_rdd, new_user_id)
+        top_currency_pairs = get_top_currency_pairs_recommendation(
+            new_user_recommendations_df, currency_pair_rdd, 0, 25)
+        top_currency_pairs_rdd = sc.parallelize(map(lambda (currency_pair, rating, volume):
+            (make_key((new_user_id, currency_pair.split()[1],
+                    currency_pair.split()[0], country)), {
+                'recommendation_id': make_key((new_user_id, currency_pair.split()[1],
+                        currency_pair.split()[0], country)),
+                'provider_id': new_user_id,
+                'currency_pair': currency_pair.split()[1],
+                'transaction_type': currency_pair.split()[0],
+                'start_date': start_date,
+                'end_date': end_date,
+                'country': country,
+                'rating': rating,
+                'volume': volume
+            }), top_currency_pairs))
+        save_es_rdd(top_currency_pairs_rdd, 'forex/recommendation', key='recommendation_id')
 
-    k = 1
-    for r in top_currency_pairs:
-        print str(k) + ' - ' + str(r)
-        k += 1
+# k = 1
+# user_trades = ratings.filter(ratings.user == new_user_id).map(lambda item: (item[1], item[2])).collect()
+# user_currencies = []
+# for rr in user_trades:
+#     user_currencies.append(currency_pair_rdd.filter(lambda (key, value): key == rr[0]).collect()[0][1])
+#
+# for rr in user_trades:
+#     print str(k) + ' - ' + user_currencies[k-1] + ', ' + str(rr[1])
+#     k += 1
+#
+# k = 1
+# for r in top_currency_pairs:
+#     print str(k) + ' - ' + str(r)
+#     k += 1

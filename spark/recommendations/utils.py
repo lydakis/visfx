@@ -1,5 +1,8 @@
+import datetime as dt
+import numpy as np
+from numpy.linalg import eigh
+
 def parse_range(daterange):
-    import datetime as dt
     if 'd' in daterange:
         return dt.timedelta(days=int(daterange.replace('d', '')))
     elif 'w' in daterange:
@@ -12,7 +15,6 @@ def parse_range(daterange):
         raise
 
 def parse_dates(end_date, daterange):
-    import datetime as dt
     end_date = dt.datetime.strptime(end_date, '%Y-%m-%d')
     start_date = end_date - parse_range(daterange)
     return start_date.isoformat(), end_date.isoformat()

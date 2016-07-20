@@ -1,5 +1,6 @@
 d3.queue()
   .defer(d3.csv, "mock-data/features.csv")
+  .defer(d3.csv, "mock-data/ratings.csv")
   .await(makeGraphs);
 
 var colors = d3.scale.category10();
@@ -13,10 +14,11 @@ var radarChartConfig = {
   ExtraWidthX: 200
 }
 
-function makeGraphs(error, data) {
+function makeGraphs(error, data, ratings) {
   formatData(data);
   this.data = data;
   this.ft = crossfilter(data);
+  this.rt = crossfilter(ratings);
 
   this.featuresByTrade = ft.dimension(function(d) {
     return d.provider_id + " " + d.country + " " + d.transaction_type + " " +
