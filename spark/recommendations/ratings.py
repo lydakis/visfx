@@ -5,7 +5,7 @@ import json
 from numpy.linalg import svd
 from elasticsearch_interface \
     import get_es_rdd, save_es_rdd, get_currency_pair_dict
-from utils import parse_range, parse_dates, modify_record, make_key
+from utils import parse_range, parse_dates, modify_record
 
 def get_keys(rdd):
     return rdd.sortByKey().map(lambda item: (item[0]))
@@ -120,9 +120,27 @@ def get_ratings(sc, rdd, rating_function):
             'provider_ratings': provider_ratings,
             'currency_ratings': currency_ratings,
             'country_ratings': country_ratings})
-    weights = {'pc': trade_weights, 'p': provider_weights, 'c': currency_weights, 'l': country_weights, 'a': overall_weights}
-    variance = {'pc': trade_variance, 'p': provider_variance, 'c': currency_variance, 'l': country_variance, 'a': overall_variance}
-    coordinates = {'pc': trade_coordinates, 'p': provider_coordinates, 'c': currency_coordinates, 'l': country_coordinates, 'a': overall_coordinates}
+    weights = {
+        'pc': trade_weights,
+        'p': provider_weights,
+        'c': currency_weights,
+        'l': country_weights,
+        'a': overall_weights
+    }
+    variance = {
+        'pc': trade_variance,
+        'p': provider_variance,
+        'c': currency_variance,
+        'l': country_variance,
+        'a': overall_variance
+    }
+    coordinates = {
+        'pc': trade_coordinates,
+        'p': provider_coordinates,
+        'c': currency_coordinates,
+        'l': country_coordinates,
+        'a': overall_coordinates
+    }
     return format_ratings(rdd, overall_ratings, weights, variance)
 
 def rating_meta_data(coordinates, weights, variance):
