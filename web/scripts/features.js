@@ -1,6 +1,6 @@
 d3.queue()
   .defer(d3.csv, "mock-data/features.csv")
-  .defer(d3.csv, "mock-data/ratings.csv")
+  .defer(d3.csv, "mock-data/points.csv")
   .await(makeGraphs);
 
 var colors = d3.scale.category10();
@@ -14,34 +14,40 @@ var radarChartConfig = {
   ExtraWidthX: 200
 }
 
-function makeGraphs(error, data, ratings) {
-  formatData(data);
-  this.data = data;
-  this.ft = crossfilter(data);
-  this.rt = crossfilter(ratings);
+bubbleChart = dc.bubbleChart("#bubble-chart")
+  .margins({ top: 24, left: 20, bottom: 20, right: 0 })
+  .width(1200)
+  .height(700);
 
-  this.featuresByTrade = ft.dimension(function(d) {
+function makeGraphs(error, data, points) {
+  formatData(data, points);
+  this.data = data;
+  this.points = points;
+  ft = crossfilter(data);
+  pt = crossfilter(points);
+
+  featuresByTrade = ft.dimension(function(d) {
     return d.provider_id + " " + d.country + " " + d.transaction_type + " " +
       d.currency_pair;
   })
 
-  this.featuresByProvider = ft.dimension(function(d) {
+  featuresByProvider = ft.dimension(function(d) {
     return d.provider_id;
   });
 
-  this.featuresByCurrency = ft.dimension(function(d) {
+  featuresByCurrency = ft.dimension(function(d) {
     return d.currency_pair;
   });
 
-  this.featuresByType = ft.dimension(function(d) {
+  featuresByType = ft.dimension(function(d) {
     return d.transaction_type;
   });
 
-  this.featuresByCountry = ft.dimension(function(d) {
+  featuresByCountry = ft.dimension(function(d) {
     return d.country;
   });
 
-  this.averageFeaturesGroup = this.ft.dimension(function(d) {
+  averageFeaturesGroup = this.ft.dimension(function(d) {
     return d.country + " " + d.provider_id + " " + d.transaction_type + " " + d.currency_pair;
   })
     .groupAll()
@@ -184,12 +190,92 @@ function makeGraphs(error, data, ratings) {
       }
     );
 
+  pointByID = pt.dimension(function(d) {
+    return d.provider_id + " " +
+      d.country + " " +
+      d.transaction_type + " " +
+      d.currency_pair;
+  })
+  pointByIDGroup = pointByID.group().reduce(
+    function(p, v) {
+      ++p.count;
+      p.sumx += v.x;
+      p.sumy += v.y;
+      p.sumwx += v.wx;
+      p.sumwy += v.wy;
+      p.sumz += v.rating;
+      p.x = p.sumx / p.count;
+      p.y = p.sumy / p.count;
+      p.wx = p.sumwx / p.count;
+      p.wy = p.sumwy / p.count;
+      p.z = p.sumz / p.count;
+      return p;
+    },
+    function(p, v) {
+      --p.count;
+      p.sumx -= v.x;
+      p.sumy -= v.y;
+      p.sumwx -= v.wx;
+      p.sumwy -= v.wy;
+      p.sumz -= v.rating;
+      p.x = p.sumx / p.count;
+      p.y = p.sumy / p.count;
+      p.wx = p.sumwx / p.count;
+      p.wy = p.sumwy / p.count;
+      p.z = p.sumz / p.count;
+      return p;
+    },
+    function() {
+      return {
+        count: 0,
+        sumx: 0,
+        sumy: 0,
+        sumwx: 0,
+        sumwy: 0,
+        sumz: 0,
+        x: 0,
+        y: 0,
+        wx: 0,
+        wy: 0,
+        z: 0
+      };
+    }
+  )
+
+  bubbleChart
+    .dimension(pointByID)
+    .group(pointByIDGroup)
+    .keyAccessor(function(p) {
+      return p.value.x;
+    })
+    .valueAccessor(function(p) {
+      return p.value.y;
+    })
+    .colorAccessor(function(p) {
+      return p.value.z;
+    })
+    .radiusValueAccessor(function(p) {
+      return p.value.z / 100;
+    })
+    .x(d3.scale.linear().domain([-30, 80]))
+    .y(d3.scale.linear().domain([-50, 30]))
+    .colors(d3.scale.linear().domain([0, 5]).range(['red', 'blue']))
+    .clipPadding(10)
+    .brushOn(false)
+    .renderLabel(false)
+    .renderTitle(true)
+    .title(function(p) { return p.key + ": " + p.value.z; })
+    .renderHorizontalGridLines(true)
+    .renderVerticalGridLines(true);
+
+  dc.renderAll();
+
   setupInputRange();
   updateSelections(true);
   drawRadarCharts();
 }
 
-function formatData(data) {
+function formatData(data, points) {
   var dateFormat = d3.time.format("%Y-%m-%d");
 
   data.forEach(function(d) {
@@ -217,6 +303,15 @@ function formatData(data) {
     d.start_date = dateFormat.parse(d.start_date);
     d.end_date = dateFormat.parse(d.end_date);
   });
+
+  points.forEach(function(d) {
+    d.provider_id = +d.provider_id;
+    d.rating = +d.rating;
+    d.x = 1000 * (+d.x);
+    d.y = 1000 * (+d.y);
+    d.wx = 10000 * (+d.wx);
+    d.wy = 10000 * (+d.wy);
+  })
 }
 
 function formatRadarChartData(averageFeatures, type) {
@@ -386,4 +481,45 @@ function emptySelections(selection) {
       currencySelection.remove(i);
     }
   }
+}
+
+function toggleCheckbox(checkbox) {
+  if (true === checkbox.checked) {
+    bubbleChart
+      .keyAccessor(function(p) {
+        return p.value.wx;
+      })
+      .valueAccessor(function(p) {
+        return p.value.wy;
+      })
+      .colorAccessor(function(p) {
+        return p.value.z;
+      })
+      .radiusValueAccessor(function(p) {
+        return p.value.z / 100;
+      })
+      .x(d3.scale.linear().domain([-30, 80]))
+      .y(d3.scale.linear().domain([-10, 30]))
+      .colors(d3.scale.linear().domain([0, 5]).range(['red', 'blue']));
+  }
+  else {
+    bubbleChart
+      .keyAccessor(function(p) {
+        return p.value.x;
+      })
+      .valueAccessor(function(p) {
+        return p.value.y;
+      })
+      .colorAccessor(function(p) {
+        return p.value.z;
+      })
+      .radiusValueAccessor(function(p) {
+        return p.value.z / 100;
+      })
+      .x(d3.scale.linear().domain([-30, 80]))
+      .y(d3.scale.linear().domain([-50, 30]))
+      .colors(d3.scale.linear().domain([0, 5]).range(['red', 'blue']));
+  }
+
+  dc.redrawAll();
 }
