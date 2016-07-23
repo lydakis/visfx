@@ -190,13 +190,18 @@ function makeGraphs(error, data, points) {
       }
     );
 
-  pointByID = pt.dimension(function(d) {
+  pointsByProvider = pt.dimension(function(d) { return d.provider_id; })
+  pointsByCountry = pt.dimension(function(d) { return d.country; })
+  pointsByType = pt.dimension(function(d) { return d.transaction_type; })
+  pointsByCurrency = pt.dimension(function(d) { return d.currency_pair; })
+
+  pointsByID = pt.dimension(function(d) {
     return d.provider_id + " " +
       d.country + " " +
       d.transaction_type + " " +
       d.currency_pair;
   })
-  pointByIDGroup = pointByID.group().reduce(
+  pointsByIDGroup = pointsByID.group().reduce(
     function(p, v) {
       ++p.count;
       p.sumx += v.x;
@@ -243,8 +248,8 @@ function makeGraphs(error, data, points) {
   )
 
   bubbleChart
-    .dimension(pointByID)
-    .group(pointByIDGroup)
+    .dimension(pointsByID)
+    .group(pointsByIDGroup)
     .keyAccessor(function(p) {
       return p.value.x;
     })
@@ -388,6 +393,16 @@ function changeSelection(selection) {
   this.featuresByCurrency.filter(
     currencySelection.value !== "All" ? currencySelection.value : null);
 
+  this.pointsByProvider.filter(
+    providerSelection.value !== "All" ? +providerSelection.value : null);
+  this.pointsByCountry.filter(
+    countrySelection.value !== "All" ? countrySelection.value : null);
+  this.pointsByType.filter(
+    typeSelection.value !== "All" ? typeSelection.value : null);
+  this.pointsByCurrency.filter(
+    currencySelection.value !== "All" ? currencySelection.value : null);
+
+  dc.redrawAll();
   // emptySelections(selection);
   // updateSelections(false);
   drawRadarCharts();
