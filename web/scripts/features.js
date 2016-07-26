@@ -16,7 +16,7 @@ var radarChartConfig = {
 
 bubbleChart = dc.bubbleChart("#bubble-chart")
   .margins({ top: 24, left: 20, bottom: 20, right: 0 })
-  .width(1200)
+  .width(1120)
   .height(700);
 
 function makeGraphs(error, data, points) {
@@ -262,8 +262,8 @@ function makeGraphs(error, data, points) {
     .radiusValueAccessor(function(p) {
       return p.value.z / 100;
     })
-    .x(d3.scale.linear().domain([-30, 80]))
-    .y(d3.scale.linear().domain([-50, 30]))
+    .x(d3.scale.linear().domain([-20, 50]))
+    .y(d3.scale.linear().domain([-40, 30]))
     .colors(d3.scale.linear().domain([0, 5]).range(['red', 'blue']))
     .clipPadding(10)
     .brushOn(false)

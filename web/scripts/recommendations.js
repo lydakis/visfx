@@ -55,7 +55,7 @@ function makeGraphs(error, recommendations, ratings, fratings) {
     .margin({ top: 24, left: 150, bottom: 12, right: 0 })
     .mode("queue")
     .render()
-    .hideAxis(["rating_id", "recommendation_id", "country", "start_date", "end_date", "volume"])
+    .hideAxis(["rating_id", "recommendation_id", "start_date", "end_date", "volume"])
     .brushMode("1D-axes-multi")
     .reorderable();
 
@@ -79,6 +79,7 @@ function makeGraphs(error, recommendations, ratings, fratings) {
       function(d) { return d.rating; },
       function(d) { return d.volume; }
     ])
+    .size(10)
     .sortBy(function(d) { return d.rating; })
     .order(d3.descending);
 
@@ -162,9 +163,10 @@ function highlightProvider(provider) {
 function generateParcoordsDimensions() {
   return {
     "provider_id": { index: 0, title: "Provider ID" },
-    "transaction_type": { index: 2, title: "Transation Type" },
-    "currency_pair": { index: 3, title: "Currency Pair" },
-    "rating": { index: 4, title: "Rating" },
-    "isRecommendation": { index: 1, title: "Recommendation" }
+    "country": {index: 1, title: "Country" },
+    "isRecommendation": { index: 2, title: "Recommendation" },
+    "transaction_type": { index: 3, title: "Transation Type" },
+    "currency_pair": { index: 4, title: "Currency Pair" },
+    "rating": { index: 5, title: "Rating" }
   };
 }
