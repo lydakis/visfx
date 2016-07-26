@@ -513,8 +513,8 @@ function toggleCheckbox(checkbox) {
       .radiusValueAccessor(function(p) {
         return p.value.z / 100;
       })
-      .x(d3.scale.linear().domain([-30, 80]))
-      .y(d3.scale.linear().domain([-10, 30]))
+      .x(d3.scale.linear().domain([-60, 30]))
+      .y(d3.scale.linear().domain([-30, 10]))
       .colors(d3.scale.linear().domain([0, 5]).range(['red', 'blue']));
   }
   else {
@@ -531,8 +531,8 @@ function toggleCheckbox(checkbox) {
       .radiusValueAccessor(function(p) {
         return p.value.z / 100;
       })
-      .x(d3.scale.linear().domain([-30, 80]))
-      .y(d3.scale.linear().domain([-50, 30]))
+      .x(d3.scale.linear().domain([-20, 50]))
+      .y(d3.scale.linear().domain([-40, 30]))
       .colors(d3.scale.linear().domain([0, 5]).range(['red', 'blue']));
   }
 

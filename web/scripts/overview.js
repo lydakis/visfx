@@ -2,8 +2,6 @@ d3.queue()
   .defer(d3.csv, "mock-data/transactions.csv")
   .await(makeGraphs);
 
-var advancedFiltering = false;
-
 var colors = d3.scale.category20b();
 var color = function(d) { return colors(d.provider_id); };
 
