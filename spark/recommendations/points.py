@@ -95,7 +95,7 @@ if __name__ == '__main__':
     wm = mds(p)
     weighted_points = zip_keys(sc, wm, k)
 
-    pp = sc.parallelize(points.join(weighted_points).collect()) \
+    pp = sc.parallelize(points.join(weighted_points).collect())
     pr = pp.join(ratings) \
         .map(lambda (key, ((p, wp), body)):
             (key, {
