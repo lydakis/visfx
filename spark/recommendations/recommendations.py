@@ -9,11 +9,17 @@ import math
 import json
 import hashlib
 
-def generate_predictions(training_df, prediction_df, rank):
+def generate_predictions(training_df, prediction_df, rank, model=None):
     iterations = 10
     als = ALS(rank=rank, maxIter=iterations, implicitPrefs=True)
-    model = als.fit(training_df)
+    if model == None:
+        model = als.fit(training_df)
     return model.transform(prediction_df).dropna()
+
+def train_model(training_df, rank):
+    iterations = 10
+    als = ALS(rank=rank, maxIter=iterations, implicitPrefs=True)
+    return als.fit(training_df)
 
 def compute_model_parameters(ratings):
     training_df, validation_df, test_df = \
@@ -53,13 +59,13 @@ def get_counts_and_averages(ID_and_ratings_tuple):
         (nratings, float(sum(x for x in ID_and_ratings_tuple[1]))/nratings)
 
 def generate_new_user_recommendations(
-        ratings, best_rank, currency_pair_rdd, new_user_id):
+        model, ratings, best_rank, currency_pair_rdd, new_user_id):
     new_user_unrated_movies_df = currency_pair_rdd.map(lambda (key, value):
         (new_user_id, key)).toDF(["user", "item"])
     return generate_predictions(
         ratings,
         new_user_unrated_movies_df,
-        best_rank)
+        best_rank, model)
 
 def get_top_currency_pairs_recommendation(
         new_user_recommendations_df, currency_pair_rdd, threshold, top_count):
@@ -136,14 +142,13 @@ if __name__ == '__main__':
     currency_pair_rating_counts_rdd = \
         currency_pair_id_with_avg_ratings_rdd.map(lambda x: (x[0], x[1][0]))
 
-# new_user_id = 1983448
-
     providers = rdd.map(lambda (_, body): body['provider_id']).collect()
 
+    model = train_model(ratings, best_rank)
     for new_user_id in providers:
         country = get_country(rdd, new_user_id)
         new_user_recommendations_df = generate_new_user_recommendations(
-            ratings, best_rank, currency_pair_rdd, new_user_id)
+            model, ratings, best_rank, currency_pair_rdd, new_user_id)
         top_currency_pairs = get_top_currency_pairs_recommendation(
             new_user_recommendations_df, currency_pair_rdd, 0, 25)
         top_currency_pairs_rdd = sc.parallelize(map(lambda (currency_pair, rating, volume):
@@ -161,18 +166,3 @@ if __name__ == '__main__':
                 'volume': volume
             }), top_currency_pairs))
         save_es_rdd(top_currency_pairs_rdd, 'forex/recommendation', key='recommendation_id')
-
-# k = 1
-# user_trades = ratings.filter(ratings.user == new_user_id).map(lambda item: (item[1], item[2])).collect()
-# user_currencies = []
-# for rr in user_trades:
-#     user_currencies.append(currency_pair_rdd.filter(lambda (key, value): key == rr[0]).collect()[0][1])
-#
-# for rr in user_trades:
-#     print str(k) + ' - ' + user_currencies[k-1] + ', ' + str(rr[1])
-#     k += 1
-#
-# k = 1
-# for r in top_currency_pairs:
-#     print str(k) + ' - ' + str(r)
-#     k += 1
