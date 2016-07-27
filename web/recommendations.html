@@ -42,8 +42,16 @@
       <br>
       <div id="parcoords-overview" class="parcoords" style="width:1300px;margin-left:-180px;height:750px;"></div>
       <br>
-      <span>Select Provider ID: </span><span id="provider-value">All</em></span>
-      <input id="provider-range" type="range" value="0" oninput="rangeChanged()">
+      <div class="row">
+        <div class="col-md-6">
+          <span>Provider ID: </span><br>
+          <select id="provider-selection" size="4" style="margin-top:5px;" onchange="changeSelection(this)"></select>
+        </div>
+        <div class="col-md-6">
+          <span>Trade: </span><span id="provider-value">All</em></span>
+          <input id="provider-range" type="range" value="0" oninput="rangeChanged()" style="display:inline;margin-top:10px;">
+        </div>
+      </div>
       <br>
       <div class="row">
         <div class="col-md-4">
@@ -75,7 +83,7 @@
           </div>
         </div>
       </div>
-      <!-- <svg width="1000" height="1100" style="margin-left:80px;"></svg> -->
+      <!-- <svg id="chord-data" width="1000" height="1100" style="margin-left:80px;margin-top:600px"></svg> -->
       <br>
     </div>
 

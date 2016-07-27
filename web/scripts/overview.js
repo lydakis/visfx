@@ -3,7 +3,7 @@ d3.queue()
   .await(makeGraphs);
 
 var colors = d3.scale.category20b();
-var color = function(d) { return colors(d.provider_id); };
+var color = function(d) { return colors(d.country); };
 
 var parcoords = d3.parcoords()("#parcoords-overview")
   .color(color)
@@ -11,7 +11,7 @@ var parcoords = d3.parcoords()("#parcoords-overview")
   .alpha(0.25)
   .composite("darken");
 
-var ppaChart = dc.barChart("#ppa")
+var ppaChart = dc.lineChart("#ppa")
   .width(600)
   .height(400);
 
@@ -24,6 +24,16 @@ var tradingVolume = dc.lineChart("#trading-volume")
   .width(600)
   .height(400);
 
+var pairPNL = dc.barChart("#pair-pnl")
+  .width(1120)
+  .height(400);
+
+// var providerPNL = dc.barChart("#provider-pnl")
+//   .width(1120)
+//   .height(400);
+
+var totalProfits = dc.numberDisplay("#total-profits");
+var totalLosses = dc.numberDisplay("#total-losses");
 var netPNL = dc.numberDisplay("#net-pnl");
 
 function makeGraphs(error, transactions) {
@@ -33,7 +43,19 @@ function makeGraphs(error, transactions) {
   this.transactionsByProvider = tr.dimension(function(d) {
     return d.provider_id;
   });
-  setupInputRange()
+  var transactionsByProviderPNLGroup = transactionsByProvider.group().reduce(
+    function(p, v) {
+      p.net_pnl += v.net_pnl;
+      return p;
+    },
+    function(p, v) {
+      p.net_pnl -= v.net_pnl;
+      return p;
+    },
+    function() {
+      return { net_pnl: 0 }
+    }
+  );
 
   var transactionsByID = tr.dimension(function(d) {
     return d.transaction_id;
@@ -69,6 +91,25 @@ function makeGraphs(error, transactions) {
     return d.currency_pair;
   });
   var transactionsByCurrencyGroup = transactionsByCurrency.group();
+  var transactionsByCurrency2 = tr.dimension(function(d) {
+    return d.currency_pair;
+  });
+  transactionsByCurrency3 = tr.dimension(function(d) {
+    return d.currency_pair;
+  });
+  var transactionsByCurrencyPNLGroup = transactionsByCurrency2.group().reduce(
+    function(p, v) {
+      p.net_pnl += v.net_pnl;
+      return p;
+    },
+    function(p, v) {
+      p.net_pnl -= v.net_pnl;
+      return p;
+    },
+    function() {
+      return { net_pnl: 0 }
+    }
+  );
 
   var transactionsByDateClosedHourly = tr.dimension(function(d) {
     return d3.time.format("%Y-%m-%dT%H").parse(
@@ -78,23 +119,47 @@ function makeGraphs(error, transactions) {
       d.date_closed.getHours());
   });
   var transactionsByDateClosedHourlyGroup = transactionsByDateClosedHourly.group()
+  var transactionsByDateClosedHourlyPNLGroup = transactionsByDateClosedHourly.group().reduce(
+    function(p, v) {
+      p.net_pnl += v.net_pnl;
+      return p;
+    },
+    function(p, v) {
+      p.net_pnl -= v.net_pnl;
+      return p;
+    },
+    function() {
+      return { net_pnl: 0 }
+    }
+  );
 
-  var transactionsByPNLGroup = tr.dimension(function(d) {
+  transactionsByPNLGroup = tr.dimension(function(d) {
     return d.transaction_id;
   })
     .groupAll().reduce(
       function(p, v) {
+        p.p += v.net_pnl >= 0 ? v.net_pnl : 0;
+        p.l += v.net_pnl < 0 ? v.net_pnl : 0;
         p.net_pnl += v.net_pnl;
         return p;
       },
       function(p, v) {
+        p.p -= v.net_pnl >= 0 ? v.net_pnl : 0;
+        p.l -= v.net_pnl < 0 ? v.net_pnl : 0;
         p.net_pnl -= v.net_pnl;
         return p;
       },
       function() {
-        return { net_pnl: 0 };
+        return { p: 0, l: 0, net_pnl: 0 };
       }
     );
+
+  transactionsByType = tr.dimension(function(d) {
+    return d.transaction_type;
+  });
+  transactionsByCountry = tr.dimension(function(d) {
+    return d.country;
+  });
 
   var parcoordsDimensions = generateParcoordsDimensions();
 
@@ -111,17 +176,49 @@ function makeGraphs(error, transactions) {
 
   ppaChart
     .margins({ top: 24, left: 60, bottom: 20, right: 0 })
-    .dimension(transactionsByDateClosed)
-    .group(transactionsByDateClosedGroup)
-    .valueAccessor(function(d) { return +d.value.ppa; })
+    .dimension(transactionsByDateClosedHourly)
+    .group(transactionsByDateClosedHourlyPNLGroup)
+    // .interpolate("bundle")
+    .valueAccessor(function(d) { return +d.value.net_pnl; })
     .x(d3.time.scale().domain([new Date(2015, 4, 1), new Date(2015, 4, 7)]))
     .renderHorizontalGridLines(true)
+    .renderVerticalGridLines(true)
     .brushOn(true)
     .clipPadding(10)
     .elasticY(true)
-    .gap(10)
+    // .gap(10)
     .xUnits(d3.time.days)
-    .yAxisLabel("Net PNL per Amount");
+    .yAxisLabel("Net PNL ($)");
+
+  pairPNL
+    .margins({ top: 24, left: 60, bottom: 45, right: 0 })
+    .dimension(transactionsByCurrency2)
+    .group(transactionsByCurrencyPNLGroup)
+    .valueAccessor(function(d) { return +d.value.net_pnl; })
+    .x(d3.scale.ordinal().domain([""]))
+    .renderHorizontalGridLines(true)
+    .renderVerticalGridLines(true)
+    .brushOn(true)
+    .clipPadding(10)
+    .elasticY(true)
+    .elasticX(true)
+    .xUnits(dc.units.ordinal)
+    .yAxisLabel("Net PNL ($)");
+
+  // providerPNL
+  //   .margins({ top: 24, left: 60, bottom: 45, right: 0 })
+  //   .dimension(transactionsByProvider)
+  //   .group(transactionsByProviderPNLGroup)
+  //   .valueAccessor(function(d) { return +d.value.net_pnl; })
+  //   .x(d3.scale.linear().domain([0, 2]))
+  //   .renderHorizontalGridLines(true)
+  //   .renderVerticalGridLines(true)
+  //   .brushOn(true)
+  //   .clipPadding(10)
+  //   .elasticY(true)
+  //   .elasticX(true)
+  //   // .xUnits(dc.units.ordinal)
+  //   .yAxisLabel("Net PNL ($)");
 
   currencyCounts
     .dimension(transactionsByCurrency)
@@ -130,19 +227,33 @@ function makeGraphs(error, transactions) {
   tradingVolume
     .margins({ top: 24, left: 60, bottom: 20, right: 0 })
     .x(d3.time.scale().domain([new Date(2015, 4, 1), new Date(2015, 4, 7)]))
-    .interpolate("bundle")
+    // .interpolate("bundle")
     .brushOn(true)
+    .renderHorizontalGridLines(true)
+    .renderVerticalGridLines(true)
     .yAxisLabel("Trading Volume")
     .clipPadding(10)
     .elasticY(true)
     .dimension(transactionsByDateClosedHourly)
     .group(transactionsByDateClosedHourlyGroup)
 
+  totalProfits
+    .formatNumber(function(d) { return "$ " + d3.format(",.2f")(d); })
+    .valueAccessor(function(d) { return d.p; })
+    .group(transactionsByPNLGroup);
+
+  totalLosses
+    .formatNumber(function(d) { return "$ " + d3.format(",.2f")(d); })
+    .valueAccessor(function(d) { return d.l; })
+    .group(transactionsByPNLGroup);
+
   netPNL
     .formatNumber(function(d) { return "$ " + d3.format(",.2f")(d); })
     .valueAccessor(function(d) { return d.net_pnl; })
     .group(transactionsByPNLGroup);
 
+  setupInputRange();
+  updateSelections(true);
   dc.renderAll();
 }
 
@@ -253,4 +364,88 @@ function generateParcoordsDimensions() {
 function setupInputRange() {
   document.getElementById("provider-range")
     .setAttribute("max", this.transactionsByProvider.group().size());
+}
+
+function changeSelection(selection) {
+  var providerSelection = document.getElementById("provider-selection");
+  var countrySelection = document.getElementById("country-selection");
+  var typeSelection = document.getElementById("type-selection");
+  var currencySelection = document.getElementById("currency-selection");
+  if (providerSelection.value !== "All") {
+    this.parcoords.highlight(this.transactionsByProvider.filter(providerSelection.value).top(Infinity));
+  }
+  else {
+    this.transactionsByProvider.filterAll();
+  }
+  if (countrySelection.value !== "All") {
+    this.parcoords.highlight(this.transactionsByCountry.filter(countrySelection.value).top(Infinity));
+  }
+  else {
+    this.transactionsByCountry.filterAll();
+  }
+  if (typeSelection.value !== "All") {
+    this.parcoords.highlight(this.transactionsByType.filter(typeSelection.value).top(Infinity));
+  }
+  else {
+    this.transactionsByType.filterAll();
+  }
+  if (currencySelection.value !== "All") {
+    this.parcoords.highlight(this.transactionsByCurrency3.filter(currencySelection.value).top(Infinity));
+  }
+  else {
+    this.transactionsByCurrency3.filterAll();
+  }
+  if (providerSelection.value === "All" &&
+      countrySelection.value === "All" &&
+      typeSelection.value === "All" &&
+      currencySelection.value === "All") {
+    this.parcoords.unhighlight();
+  }
+
+  dc.redrawAll();
+}
+
+function updateSelections(first) {
+  var providerSelection = document.getElementById("provider-selection");
+  var countrySelection = document.getElementById("country-selection");
+  var typeSelection = document.getElementById("type-selection");
+  var currencySelection = document.getElementById("currency-selection");
+
+  providerSelection.multiple = true;
+
+  if (first) {
+    var pAll = document.createElement("option");
+    pAll.text = "All";
+    pAll.selected = "selected";
+    providerSelection.add(pAll);
+    var lAll = document.createElement("option");
+    lAll.text = "All";
+    countrySelection.add(lAll);
+    var tAll = document.createElement("option");
+    tAll.text = "All";
+    typeSelection.add(tAll);
+    var cAll = document.createElement("option");
+    cAll.text = "All";
+    currencySelection.add(cAll);
+  }
+  this.transactionsByProvider.group().orderNatural().all().forEach(function(d) {
+    var option = document.createElement("option");
+    option.text = d.key;
+    providerSelection.add(option);
+  });
+  this.transactionsByCountry.group().orderNatural().all().forEach(function(d) {
+    var option = document.createElement("option");
+    option.text = d.key;
+    countrySelection.add(option);
+  });
+  this.transactionsByType.group().orderNatural().all().forEach(function(d) {
+    var option = document.createElement("option");
+    option.text = d.key;
+    typeSelection.add(option);
+  });
+  this.transactionsByCurrency3.group().orderNatural().all().forEach(function(d) {
+    var option = document.createElement("option");
+    option.text = d.key;
+    currencySelection.add(option);
+  });
 }

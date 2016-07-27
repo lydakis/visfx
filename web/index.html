@@ -42,8 +42,30 @@
       <br>
       <div id="parcoords-overview" class="parcoords" style="width:1300px;margin-left:-180px;height:750px;"></div>
       <br>
-      <span>Select Provider ID: </span><span id="provider-value">All</em></span>
-      <input id="provider-range" type="range" value="0" oninput="rangeChanged()" onchange="redrawCharts()">
+      <div class="row">
+        <div class="col-md-2">
+          <span>Provider ID: </span>
+          <select id="provider-selection" muliple="true" style="margin-top:5px;" onchange="changeSelection(this)"></select>
+        </div>
+        <div class="col-md-2 col-half-offset">
+          <span>Country: </span>
+          <select id="country-selection" style="margin-top:5px;" onchange="changeSelection(this)"></select>
+        </div>
+        <div class="col-md-2 col-half-offset">
+          <span>Transaction Type: </span>
+          <select id="type-selection" style="margin-top:5px;" onchange="changeSelection(this)"></select>
+        </div>
+        <div class="col-md-2 col-half-offset">
+          <span>Currency Pair: </span>
+          <select id="currency-selection" style="margin-top:5px;" onchange="changeSelection(this)"></select>
+        </div>
+        <div class="col-md-2 col-half-offset">
+          <span>Trade: </span>
+          <input id="provider-range" type="range" value="0" oninput="rangeChanged()" onchange="redrawCharts()" style="margin-top:6px;">
+        </div>
+      </div>
+      <br>
+      <span>Currently viewing Provider w/ ID: </span><span id="provider-value">All</em></span><br>
       <span>Advanced Filtering: </span>
       <input id="checkbox" type="checkbox" onchange="toggleCheckbox()">
       <div class="row">
@@ -59,9 +81,21 @@
           <div id="ppa" class="dc-charts" style="width:650px;height:400px;"></div>
         </div>
         <div class="col-md-6">
-          <div id="net-pnl" class="number-box" style="margin-left:152px;margin-top:50px"><p>Net PnL</p></div>
+          <div id="total-profits" class="number-box" style="margin-left:152px;margin-top:50px;"><p>Net PnL</p></div>
+          <div id="total-losses" class="number-box2" style="margin-left:152px;"></div>
+          <div id="net-pnl" class="number-box3" style="margin-left:152px;"><hr></div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div id="pair-pnl" class="dc-charts my-bar-chart" style="width:1200;height:450px;"></div>
+        </div>
+      </div>
+      <!-- <div class="row">
+        <div class="col-md-12">
+          <div id="provider-pnl" class="dc-charts" style="width:1200;height:450px;"></div>
+        </div>
+      </div> -->
     </div>
 
     <script src="scripts/es.js" type="text/javascript"></script>

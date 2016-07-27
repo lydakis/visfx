@@ -383,7 +383,6 @@ function changeSelection(selection) {
   var countrySelection = document.getElementById("country-selection");
   var typeSelection = document.getElementById("type-selection");
   var currencySelection = document.getElementById("currency-selection");
-  console.log("here!");
   this.featuresByProvider.filter(
     providerSelection.value !== "All" ? +providerSelection.value : null);
   this.featuresByCountry.filter(

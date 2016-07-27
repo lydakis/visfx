@@ -94,7 +94,95 @@ function makeGraphs(error, recommendations, ratings, fratings) {
     .sortBy(function(d) { return d.rating; })
     .order(d3.descending);
 
+  // chordData = chordChartData(data);
+  //
+  // var ch = viz.ch().data(chordData).padding(.01)
+  //   .innerRadius(330)
+  //   .outerRadius(350)
+  //   .chordOpacity(0.3)
+  //   .labelOrientThreshold(1)
+  //   .labelPadding(.03)
+  //   .fill(d3.scale.category10());
+  //
+  // var svg = d3.select("svg#chord-data");
+  // ch.defs(svg, 1);
+  // svg.append("g").attr("transform", "translate(500,550)").call(ch);
+
+  updateSelections(true);
   dc.renderAll();
+}
+
+function chordChartData(data) {
+  var byProvider = {};
+  data.forEach(function(d) {
+    var currency = d.transaction_type + " " + d.currency_pair;
+    if (d.provider_id in byProvider) {
+      if (d.isRecommendation == "YES") {
+        byProvider[d.provider_id].r.push([currency, 1]);
+      }
+      else {
+        byProvider[d.provider_id].prev.push(currency);
+      }
+    }
+    else {
+      byProvider[d.provider_id] = {
+        "prev": [],
+        "r": []
+      };
+      if (d.isRecommendation == "YES") {
+        byProvider[d.provider_id].r.push([currency, 1]);
+      }
+      else {
+        byProvider[d.provider_id].prev.push(currency);
+      }
+    }
+  });
+
+  var byPrev = {};
+  for (var provider in byProvider) {
+    for (var i = 0; i < byProvider[provider].prev.length; i++) {
+      var c = byProvider[provider].prev[i];
+      if (c in byPrev) {
+        byPrev[c] = merge(byPrev[c], byProvider[provider].r)
+      }
+      else {
+        byPrev[c] = byProvider[provider].r;
+      }
+    }
+  }
+
+  var res = []
+  for (var currency in byPrev) {
+    for (var i = 0; i < byPrev[currency].length; i++) {
+      var mean = d3.mean(byPrev[currency], function(d) { return d[1]; })
+      if (byPrev[currency][i][1] > mean) {
+        res.push([currency].concat(byPrev[currency][i]));
+      }
+    }
+  }
+
+  return res;
+}
+
+function merge(a, b) {
+  var p = []
+  var flag = true;
+  for (var i = 0; i < b.length; i++) {
+    for (var j = 0; j < a.length; j++) {
+      if (a[j][0].localeCompare(b[i][0]) === 0) {
+        ++a[j][1];
+        flag = false;
+        break;
+      }
+    }
+    if (flag) {
+      p.push(b[i]);
+    }
+    else {
+      flag = true;
+    }
+  }
+  return a.concat(p);
 }
 
 function formatData(data) {
@@ -169,4 +257,32 @@ function generateParcoordsDimensions() {
     "currency_pair": { index: 4, title: "Currency Pair" },
     "rating": { index: 5, title: "Rating" }
   };
+}
+
+function changeSelection(selection) {
+  var providerSelection = document.getElementById("provider-selection");
+  if (providerSelection.value !== "All") {
+    highlightProvider(providerSelection.value);
+  }
+  else {
+    highlightProvider(null);
+  }
+
+  dc.redrawAll();
+  drawRadarCharts();
+}
+
+function updateSelections(first) {
+  var providerSelection = document.getElementById("provider-selection");
+
+  if (first) {
+    var pAll = document.createElement("option");
+    pAll.text = "All";
+    providerSelection.add(pAll);
+  }
+  this.dataByProvider.group().orderNatural().all().forEach(function(d) {
+    var option = document.createElement("option");
+    option.text = d.key;
+    providerSelection.add(option);
+  });
 }

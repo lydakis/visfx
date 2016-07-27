@@ -14,14 +14,46 @@ text {
 
 .number-box {
   background: orange;
-  width: 300px;
+  width: 320px;
   font-size: 32px;
   font-family: sans-serif;
   text-align: center;
-  padding-top: 100px;
-  padding-bottom: 63px;
-  height: 300px;
+  padding-top: 60px;
+  /*padding-bottom: 63px;*/
+  /*height: 320px;*/
   line-height: normal;
+  align-items: center;
+}
+
+.number-box2 {
+  background: orange;
+  width: 320px;
+  font-size: 32px;
+  font-family: sans-serif;
+  text-align: center;
+  /*padding-top: 60px;*/
+  /*padding-bottom: 63px;*/
+  /*height: 320px;*/
+  line-height: normal;
+  align-items: center;
+}
+
+.number-box3 {
+  background: orange;
+  width: 320px;
+  font-size: 32px;
+  font-family: sans-serif;
+  text-align: center;
+  /*padding-top: 10px;*/
+  padding-bottom: 63px;
+  /*height: 320px;*/
+  line-height: normal;
+  align-items: center;
+}
+
+.my-bar-chart .x.axis text {
+    text-anchor: end !important;
+    transform: rotate(-45deg);
 }
 
 select {
