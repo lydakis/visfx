@@ -60,12 +60,11 @@
           <select id="currency-selection" style="margin-top:5px;" onchange="changeSelection(this)"></select>
         </div>
         <div class="col-md-2 col-half-offset">
-          <span>Trade: </span>
+          <span>Trade: </span><span id="provider-value">All</em></span>
           <input id="provider-range" type="range" value="0" oninput="rangeChanged()" onchange="redrawCharts()" style="margin-top:6px;">
         </div>
       </div>
       <br>
-      <span>Currently viewing Provider w/ ID: </span><span id="provider-value">All</em></span><br>
       <span>Advanced Filtering: </span>
       <input id="checkbox" type="checkbox" onchange="toggleCheckbox()">
       <div class="row">
