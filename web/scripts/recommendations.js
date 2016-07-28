@@ -326,9 +326,13 @@ function makeRatesChart(docs, currencyPair, startDate, endDate) {
     }
   )
 
+  var minV = Math.round(d3.min(docs, function(d) { return d.value; }) * 100) / 100 - 0.01;
+  var maxV = Math.round(d3.max(docs, function(d) { return d.value; }) * 100) / 100 + 0.01;
+
   ratesChart = dc.seriesChart("#rates")
     .width(1120)
     .height(400)
+    .margins({ top: 24, left: 60, bottom: 45, right: 0 })
     .seriesAccessor(function(d) {return d.key[0] === 1 ? currencyPair + " ASK" : currencyPair + " BID"; })
     .keyAccessor(function(d) { return +d.key[1]; })
     .valueAccessor(function(d) { return +d.value.value; })
@@ -337,12 +341,11 @@ function makeRatesChart(docs, currencyPair, startDate, endDate) {
     .group(ratesByDateGroup)
     .brushOn(false)
     .x(d3.time.scale().domain([new Date(2015, 4, 1), new Date(2015, 4, 14)]))
-    .y(d3.scale.linear().domain([1.1, 1.15]))
-    // .elasticY(true)
+    .y(d3.scale.linear().domain([minV, maxV]))
     .renderHorizontalGridLines(true)
     .renderVerticalGridLines(true)
     .mouseZoomable(true)
     .clipPadding(10)
-    .legend(dc.legend().x(850).y(350).itemHeight(13).gap(5).horizontal(1).legendWidth(140).itemWidth(70))
+    .legend(dc.legend().x(900).y(320).itemHeight(13).gap(5).horizontal(1).legendWidth(140).itemWidth(70))
     .render();
 }
