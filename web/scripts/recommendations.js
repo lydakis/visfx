@@ -4,6 +4,9 @@ d3.queue()
   .defer(d3.csv, "mock-data/fratings.csv")
   .await(makeGraphs);
 
+var startDate = document.getElementById("start-date").value;
+var endDate = document.getElementById("end-date").value;
+
 var colors = d3.scale.ordinal()
   .domain(["NO", "YES"])
   .range(["steelblue", "brown"]);
@@ -263,13 +266,23 @@ function changeSelection(selection) {
   var providerSelection = document.getElementById("provider-selection");
   if (providerSelection.value !== "All") {
     highlightProvider(providerSelection.value);
+    if (recommendationsByProvider.top(1).length > 0) {
+      getRates("EUR/USD", "2015-05-01", "2015-05-14", makeRatesChart);
+      // getRates(recommendationsByProvider.top(1)[0].currency_pair, startDate, endDate, makeRatesChart);
+    }
   }
   else {
     highlightProvider(null);
   }
 
   dc.redrawAll();
-  drawRadarCharts();
+}
+
+function tradeChanged() {
+  if (recommendationsByProvider.top(1).length > 0) {
+    getRates("EUR/USD", "2015-05-01", "2015-05-14", makeRatesChart);
+    // getRates(recommendationsByProvider.top(1)[0].currency_pair, startDate, endDate, makeRatesChart);
+  }
 }
 
 function updateSelections(first) {
@@ -279,10 +292,57 @@ function updateSelections(first) {
     var pAll = document.createElement("option");
     pAll.text = "All";
     providerSelection.add(pAll);
+    pAll.selected = "selected";
   }
   this.dataByProvider.group().orderNatural().all().forEach(function(d) {
     var option = document.createElement("option");
     option.text = d.key;
     providerSelection.add(option);
   });
+}
+
+function makeRatesChart(docs, currencyPair, startDate, endDate) {
+  // console.log(docs);
+  var rates = crossfilter(docs);
+
+  var ratesByDate = rates.dimension(function(d) {
+    return [d.isBid, d.key];
+  });
+  var ratesByDateGroup = ratesByDate.group().reduce(
+    function(p, v) {
+      ++p.count;
+      p.sum += v.value;
+      p.value = p.sum / p.count;
+      return p;
+    },
+    function(p, v) {
+      --p.count;
+      p.sum -= v.value;
+      p.value = p.sum / p.count;
+      return p;
+    },
+    function() {
+      return { count: 0, sum: 0, value: 0 }
+    }
+  )
+
+  ratesChart = dc.seriesChart("#rates")
+    .width(1120)
+    .height(400)
+    .seriesAccessor(function(d) {return d.key[0] === 1 ? currencyPair + " ASK" : currencyPair + " BID"; })
+    .keyAccessor(function(d) { return +d.key[1]; })
+    .valueAccessor(function(d) { return +d.value.value; })
+    .chart(function(c) { return dc.lineChart(c).interpolate('linear'); })
+    .dimension(ratesByDate)
+    .group(ratesByDateGroup)
+    .brushOn(false)
+    .x(d3.time.scale().domain([new Date(2015, 4, 1), new Date(2015, 4, 14)]))
+    .y(d3.scale.linear().domain([1.1, 1.15]))
+    // .elasticY(true)
+    .renderHorizontalGridLines(true)
+    .renderVerticalGridLines(true)
+    .mouseZoomable(true)
+    .clipPadding(10)
+    .legend(dc.legend().x(850).y(350).itemHeight(13).gap(5).horizontal(1).legendWidth(140).itemWidth(70))
+    .render();
 }
