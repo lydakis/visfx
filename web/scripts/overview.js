@@ -284,12 +284,12 @@ function makeGraphs(error, transactions) {
         format: function(d) { return d.date_closed; }
       },
       {
-        label: "Amount",
-        format: function(d) { return d.amount; }
+        label: "Amount (lots)",
+        format: function(d) { return d3.format(",")(d.amount); }
       },
       {
-        label: "Net PnL",
-        format: function(d) { return d.net_pnl; }
+        label: "Net PnL ($)",
+        format: function(d) { return d3.format(",.2f")(d.net_pnl); }
       },
     ])
     .size(Infinity)
