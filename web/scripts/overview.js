@@ -35,6 +35,7 @@ var pairPNL = dc.barChart("#pair-pnl")
 var totalProfits = dc.numberDisplay("#total-profits");
 var totalLosses = dc.numberDisplay("#total-losses");
 var netPNL = dc.numberDisplay("#net-pnl");
+var dataTable = dc.dataTable("#data-table");
 
 function makeGraphs(error, transactions) {
   formatData(transactions);
@@ -53,13 +54,13 @@ function makeGraphs(error, transactions) {
       return p;
     },
     function() {
-      return { net_pnl: 0 }
+      return { net_pnl: 0 };
     }
   );
 
   var transactionsByID = tr.dimension(function(d) {
     return d.transaction_id;
-  })
+  });
 
   var transactionsByDateClosed = tr.dimension(function(d) {
     return d3.time.format("%Y-%m-%d").parse(
@@ -107,7 +108,7 @@ function makeGraphs(error, transactions) {
       return p;
     },
     function() {
-      return { net_pnl: 0 }
+      return { net_pnl: 0 };
     }
   );
 
@@ -118,7 +119,7 @@ function makeGraphs(error, transactions) {
       d.date_closed.getDate() + "T" +
       d.date_closed.getHours());
   });
-  var transactionsByDateClosedHourlyGroup = transactionsByDateClosedHourly.group()
+  var transactionsByDateClosedHourlyGroup = transactionsByDateClosedHourly.group();
   var transactionsByDateClosedHourlyPNLGroup = transactionsByDateClosedHourly.group().reduce(
     function(p, v) {
       p.net_pnl += v.net_pnl;
@@ -129,7 +130,7 @@ function makeGraphs(error, transactions) {
       return p;
     },
     function() {
-      return { net_pnl: 0 }
+      return { net_pnl: 0 };
     }
   );
 
@@ -235,7 +236,7 @@ function makeGraphs(error, transactions) {
     .clipPadding(10)
     .elasticY(true)
     .dimension(transactionsByDateClosedHourly)
-    .group(transactionsByDateClosedHourlyGroup)
+    .group(transactionsByDateClosedHourlyGroup);
 
   totalProfits
     .formatNumber(function(d) { return "$ " + d3.format(",.2f")(d); })
@@ -252,9 +253,81 @@ function makeGraphs(error, transactions) {
     .valueAccessor(function(d) { return d.net_pnl; })
     .group(transactionsByPNLGroup);
 
+  dataTable
+    .dimension(transactionsByID)
+    .group(function(d) {
+      return "Number of Trades: " + transactionsByProvider.top(Infinity).length;
+    })
+    .columns([
+      {
+        label: "Provider ID",
+        format: function(d) { return d.provider_id; }
+      },
+      {
+        label: "Country",
+        format: function(d) { return d.country; }
+      },
+      {
+        label: "Transation Type",
+        format: function(d) { return d.transaction_type; }
+      },
+      {
+        label: "Currecy Pair",
+        format: function(d) { return d.currency_pair; }
+      },
+      {
+        label: "Date Open",
+        format: function(d) { return d.date_open; }
+      },
+      {
+        label: "Date Closed",
+        format: function(d) { return d.date_closed; }
+      },
+      {
+        label: "Amount",
+        format: function(d) { return d.amount; }
+      },
+      {
+        label: "Net PnL",
+        format: function(d) { return d.net_pnl; }
+      },
+    ])
+    .size(Infinity)
+    .sortBy(function(d) { return d.provider_id; })
+    .order(d3.descending);
+  update();
+
   setupInputRange();
   updateSelections(true);
   dc.renderAll();
+}
+
+var ofs = 0, pag = 17;
+function display() {
+  d3.select('#begin')
+    .text(ofs);
+  d3.select('#end')
+    .text(ofs+pag-1);
+  d3.select('#last')
+    .attr('disabled', ofs-pag<0 ? 'true' : null);
+  d3.select('#next')
+    .attr('disabled', ofs+pag>=transactionsByProvider.top(Infinity).length ? 'true' : null);
+  d3.select('#size').text(transactionsByProvider.top(Infinity).length);
+}
+function update() {
+  dataTable.beginSlice(ofs);
+  dataTable.endSlice(ofs+pag);
+  display();
+  }
+function next() {
+  ofs += pag;
+  update();
+  dataTable.redraw();
+}
+function last() {
+  ofs -= pag;
+  update();
+  dataTable.redraw();
 }
 
 function formatData(data) {
@@ -267,7 +340,7 @@ function formatData(data) {
     d.net_pnl = +d.net_pnl;
     d.date_open = dateFormat.parse(d.date_open);
     d.date_closed = dateFormat.parse(d.date_closed);
-  })
+  });
 }
 
 function rangeChanged() {
@@ -308,7 +381,7 @@ function dateChanged() {
       .render();
     this.tr.remove();
     dc.redrawAll();
-    getTransactions(startDate, endDate, updateData)
+    getTransactions(startDate, endDate, updateData);
   }
 }
 

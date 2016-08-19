@@ -36,18 +36,18 @@ function makeGraphs(error, recommendations, ratings, fratings) {
 
   dataByProvider = dt.dimension(function(d) {
     return d.provider_id;
-  })
+  });
   recommendationsByProvider = rc.dimension(function(d) {
     return d.provider_id;
-  })
+  });
   recommendationsByProvider.filter(0);
   ratingsByProvider = rt.dimension(function(d) {
     return d.provider_id;
-  })
+  });
   ratingsByProvider.filter(0);
   fratingsByProvider = fr.dimension(function(d) {
     return d.provider_id;
-  })
+  });
   fratingsByProvider.filter(0);
 
   var parcoordsDimensions = generateParcoordsDimensions();
@@ -146,7 +146,7 @@ function chordChartData(data) {
     for (var i = 0; i < byProvider[provider].prev.length; i++) {
       var c = byProvider[provider].prev[i];
       if (c in byPrev) {
-        byPrev[c] = merge(byPrev[c], byProvider[provider].r)
+        byPrev[c] = merge(byPrev[c], byProvider[provider].r);
       }
       else {
         byPrev[c] = byProvider[provider].r;
@@ -154,10 +154,10 @@ function chordChartData(data) {
     }
   }
 
-  var res = []
+  var res = [];
   for (var currency in byPrev) {
     for (var i = 0; i < byPrev[currency].length; i++) {
-      var mean = d3.mean(byPrev[currency], function(d) { return d[1]; })
+      var mean = d3.mean(byPrev[currency], function(d) { return d[1]; });
       if (byPrev[currency][i][1] > mean) {
         res.push([currency].concat(byPrev[currency][i]));
       }
@@ -168,7 +168,7 @@ function chordChartData(data) {
 }
 
 function merge(a, b) {
-  var p = []
+  var p = [];
   var flag = true;
   for (var i = 0; i < b.length; i++) {
     for (var j = 0; j < a.length; j++) {
@@ -216,7 +216,7 @@ function formatData(data) {
       delete d["weights.l_trade_duration"];
       delete d["weights.l_net_pnl"];
     }
-  })
+  });
 }
 
 function rangeChanged() {
@@ -322,9 +322,9 @@ function makeRatesChart(docs, currencyPair, startDate, endDate) {
       return p;
     },
     function() {
-      return { count: 0, sum: 0, value: 0 }
+      return { count: 0, sum: 0, value: 0 };
     }
-  )
+  );
 
   var minV = Math.round(d3.min(docs, function(d) { return d.value; }) * 100) / 100 - 0.01;
   var maxV = Math.round(d3.max(docs, function(d) { return d.value; }) * 100) / 100 + 0.01;

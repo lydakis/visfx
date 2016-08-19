@@ -43,7 +43,7 @@ function getTransactions(startDate, endDate, callback) {
       }, getMoreUntilDone);
     }
     else {
-      callback(docs, startDate, endDate)
+      callback(docs, startDate, endDate);
     }
   });
 }
@@ -90,7 +90,6 @@ function getRates(currencyPair, startDate, endDate, callback) {
     type: "history",
     body: query
   }, function getMoreUntilDone(error, response) {
-    // console.log(response.aggregations.range.buckets[0].resolution.buckets);
     response.aggregations.range.buckets[0].resolution.buckets.forEach(function(d) {
       var dateFormat = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ");
       if (d.avg_ask.value !== null || d.avg_bid.value !== null) {

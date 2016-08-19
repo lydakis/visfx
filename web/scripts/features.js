@@ -12,7 +12,7 @@ var radarChartConfig = {
   maxValue: 2,
   levels: 10,
   ExtraWidthX: 200
-}
+};
 
 bubbleChart = dc.bubbleChart("#bubble-chart")
   .margins({ top: 24, left: 20, bottom: 20, right: 0 })
@@ -29,7 +29,7 @@ function makeGraphs(error, data, points) {
   featuresByTrade = ft.dimension(function(d) {
     return d.provider_id + " " + d.country + " " + d.transaction_type + " " +
       d.currency_pair;
-  })
+  });
 
   featuresByProvider = ft.dimension(function(d) {
     return d.provider_id;
@@ -186,21 +186,21 @@ function makeGraphs(error, data, points) {
           lNetPNLAvg: 0,
           lTradeDurationAvg: 0,
           lPNLPerAmountAvg: 0
-        }
+        };
       }
     );
 
-  pointsByProvider = pt.dimension(function(d) { return d.provider_id; })
-  pointsByCountry = pt.dimension(function(d) { return d.country; })
-  pointsByType = pt.dimension(function(d) { return d.transaction_type; })
-  pointsByCurrency = pt.dimension(function(d) { return d.currency_pair; })
+  pointsByProvider = pt.dimension(function(d) { return d.provider_id; });
+  pointsByCountry = pt.dimension(function(d) { return d.country; });
+  pointsByType = pt.dimension(function(d) { return d.transaction_type; });
+  pointsByCurrency = pt.dimension(function(d) { return d.currency_pair; });
 
   pointsByID = pt.dimension(function(d) {
     return d.provider_id + " " +
       d.country + " " +
       d.transaction_type + " " +
       d.currency_pair;
-  })
+  });
   pointsByIDGroup = pointsByID.group().reduce(
     function(p, v) {
       ++p.count;
@@ -245,7 +245,7 @@ function makeGraphs(error, data, points) {
         z: 0
       };
     }
-  )
+  );
 
   bubbleChart
     .dimension(pointsByID)
@@ -316,7 +316,7 @@ function formatData(data, points) {
     d.y = 1000 * (+d.y);
     d.wx = 10000 * (+d.wx);
     d.wy = 10000 * (+d.wy);
-  })
+  });
 }
 
 function formatRadarChartData(averageFeatures, type) {
@@ -356,7 +356,7 @@ function formatRadarChartData(averageFeatures, type) {
       {axis: "Net PnL", value: averageFeatures.value().lNetPNLAvg},
       {axis: "Net PnL per Amount", value: averageFeatures.value().lPNLPerAmountAvg},
       {axis: "Trade Duration", value: averageFeatures.value().lTradeDurationAvg}
-    ]]
+    ]];
   }
 
   return chartData;
@@ -408,13 +408,13 @@ function changeSelection(selection) {
 }
 
 function drawRadarCharts() {
-  radarChartConfig.color = colors(1)
+  radarChartConfig.color = colors(1);
   RadarChart.draw("#radar-pc", formatRadarChartData(this.averageFeaturesGroup, 'pc'), radarChartConfig);
-  radarChartConfig.color = colors(2)
+  radarChartConfig.color = colors(2);
   RadarChart.draw("#radar-p", formatRadarChartData(this.averageFeaturesGroup, 'p'), radarChartConfig);
-  radarChartConfig.color = colors(3)
+  radarChartConfig.color = colors(3);
   RadarChart.draw("#radar-c", formatRadarChartData(this.averageFeaturesGroup, 'c'), radarChartConfig);
-  radarChartConfig.color = colors(4)
+  radarChartConfig.color = colors(4);
   RadarChart.draw("#radar-l", formatRadarChartData(this.averageFeaturesGroup, 'l'), radarChartConfig);
 }
 
