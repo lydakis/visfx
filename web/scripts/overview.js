@@ -289,7 +289,7 @@ function makeGraphs(error, transactions) {
       },
       {
         label: "Net PnL ($)",
-        format: function(d) { return d3.format(",.2f")(d.net_pnl); }
+        format: function(d) { return d3.format(",")(d.net_pnl); }
       },
     ])
     .size(Infinity)
