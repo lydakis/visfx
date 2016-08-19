@@ -293,7 +293,7 @@ function makeGraphs(error, transactions) {
       },
     ])
     .size(Infinity)
-    .sortBy(function(d) { return d.provider_id; })
+    .sortBy(function(d) { return d.net_pnl; })
     .order(d3.descending);
   update();
 
