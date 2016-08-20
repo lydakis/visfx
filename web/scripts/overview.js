@@ -329,6 +329,20 @@ function last() {
   update();
   dataTable.redraw();
 }
+function toggleDirection() {
+  element = d3.select("#direction")[0][0];
+  value = element.value;
+
+  if (value === "Descending") {
+    element.value = "Ascending";
+    dataTable.order(d3.ascending);
+  }
+  else {
+    element.value = "Descending";
+    dataTable.order(d3.descending);
+  }
+  dataTable.redraw();
+}
 
 function formatData(data) {
   var dateFormat = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ");
