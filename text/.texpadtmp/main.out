@@ -1,0 +1,24 @@
+\BOOKMARK [0][-]{chapter.1}{Χρηματηριστηριακές Συναλλαγές & Συναλλάγμα}{}% 1
+\BOOKMARK [1][-]{section.1.1}{Εισαγωγή στις Χηματιστηριακές Συναλλαγές}{chapter.1}% 2
+\BOOKMARK [0][-]{chapter.2}{Απεικόνιση Δεδομένων}{}% 3
+\BOOKMARK [1][-]{section.2.1}{Τι είναι η Απεικόνιση Δεδομένων}{chapter.2}% 4
+\BOOKMARK [0][-]{chapter.3}{Συστήματα Συστάσεων}{}% 5
+\BOOKMARK [1][-]{section.3.1}{Εισαγωγή στα Συστήματα Συστάσεων}{chapter.3}% 6
+\BOOKMARK [1][-]{section.3.2}{Τύποι Συστημάτων Συστάσεων}{chapter.3}% 7
+\BOOKMARK [1][-]{section.3.3}{Συνεργατικό Φιλτράρισμα με χρήση Μοντέλου Λανθανουσών Παραγόντων με Έμμεσες Αξιολογήσεις }{chapter.3}% 8
+\BOOKMARK [0][-]{chapter.4}{Η Πλατφόρμα Visfx}{}% 9
+\BOOKMARK [1][-]{section.4.1}{Αρχιτεκτονική}{chapter.4}% 10
+\BOOKMARK [1][-]{section.4.2}{Docker}{chapter.4}% 11
+\BOOKMARK [1][-]{section.4.3}{Αποθήκευση και ανάκτηση Δεδομένων}{chapter.4}% 12
+\BOOKMARK [2][-]{subsection.4.3.1}{PostgreSQL}{section.4.3}% 13
+\BOOKMARK [2][-]{subsection.4.3.2}{Elasticsearch\040&\040Logstash}{section.4.3}% 14
+\BOOKMARK [1][-]{section.4.4}{Ανάλυση Δεδομέων}{chapter.4}% 15
+\BOOKMARK [1][-]{section.4.5}{Παρουσίαση & Απεικόνιση δεδομένων}{chapter.4}% 16
+\BOOKMARK [2][-]{subsection.4.5.1}{d3.js,\040dc.js,\040crossfilter.js}{section.4.5}% 17
+\BOOKMARK [0][-]{chapter.5}{Σενάριο Χρήσης Visfx}{}% 18
+\BOOKMARK [1][-]{section.5.1}{Εισαγωγή}{chapter.5}% 19
+\BOOKMARK [1][-]{section.5.2}{Επισκόπηση Δεδομένων – Data Overview}{chapter.5}% 20
+\BOOKMARK [1][-]{section.5.3}{Επιλογή Χαρακτηριστικών – Feature Selection}{chapter.5}% 21
+\BOOKMARK [1][-]{section.5.4}{Παρουσίαση Συστάσεων}{chapter.5}% 22
+\BOOKMARK [0][-]{chapter.6}{Συμπεράσματα}{}% 23
+\BOOKMARK [0][-]{chapter*.22}{Βιβλιογραφία}{}% 24

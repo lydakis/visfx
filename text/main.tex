@@ -1,0 +1,108 @@
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
+
+\documentclass[a4paper,11pt,twoside]{book}
+\usepackage{upatras-thesis}
+
+
+%
+% These commands need to be defined in order to produce a correct and personalized document
+%
+\newcommand{\shortdoctitle}{Διπλωματική Εργασία}
+\newcommand{\doctitle}{Επεξεργασία \& Απεικόνιση Μεγάλου Όγκου Οικονομικών Δεδομένων}
+\newcommand{\docsubtitle}{}
+\newcommand{\division}{Ηλεκτρονικής \& Υπολογιστών}
+\newcommand{\lab}{Ενσύρματης Τηλεπικοινωνίας}
+
+\newcommand{\me}{Γεωργίου Λυδάκη}
+\newcommand{\studnum}{227547}
+\newcommand{\keywords}{forex, data visualization, recommendation systems}
+\newcommand{\monthyear}{Σεπτέμβριος 2016}
+
+\newcommand{\supname}{Κωνσταντίνος Μουστάκας}
+\newcommand{\suptitle}{Επίκουρος Καθηγητής}
+\newcommand{\headofdivision}{Νικόλαος Φακωτάκης}
+\newcommand{\headofdivisiontitle}{Καθηγητής}
+
+\author{\me}
+
+
+% PDF settings
+%
+\hypersetup
+{
+    pdfauthor={\me},
+    pdftitle={\shortdoctitle},
+    pdfsubject={\doctitle},
+    pdfkeywords={\keywords}
+}
+
+\begin{document}
+
+
+\pagenumbering{roman}
+%set the number of sectioning levels that get number and appear in the contents
+\setcounter{page}{3}
+
+\include{titlepage}
+
+\clearemptydoublepage
+
+\include{certification}
+
+\clearemptydoublepage
+
+\include{about}
+
+\clearemptydoublepage
+
+\include{chapters/summary}
+
+\clearemptydoublepage
+
+\include{chapters/acknowledgements}
+
+\clearemptydoublepage
+
+\pagestyle{fancy}
+
+\tableofcontents
+%\mainmatter % book mode only
+\clearemptydoublepage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\input{chapters/introduction}
+\clearemptydoublepage
+
+\chapter{Χρηματηριστηριακές Συναλλαγές \& Συναλλάγμα}\label{ch:chap1}
+\input{chapters/chapter_1}
+\clearemptydoublepage
+
+\chapter{Απεικόνιση Δεδομένων}\label{ch:chap2}
+\input{chapters/chapter_2}
+\clearemptydoublepage
+
+\chapter{Συστήματα Συστάσεων}\label{ch:chap3}
+\input{chapters/chapter_3}
+\clearemptydoublepage
+
+\chapter{Η Πλατφόρμα Visfx}\label{ch:chap4}
+\input{chapters/chapter_4.tex}
+\clearemptydoublepage
+
+\chapter{Σενάριο Χρήσης Visfx}\label{ch:chap4}
+\input{chapters/chapter_5.tex}
+\clearemptydoublepage
+
+\chapter{Συμπεράσματα}\label{ch:chap4}
+\input{chapters/chapter_7.tex}
+\clearemptydoublepage
+
+\input{bibliography}
+\clearemptydoublepage
+
+\input{lastpage}
+
+\end{document}

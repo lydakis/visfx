@@ -1,0 +1,24 @@
+\contentsline {chapter}{\numberline {1}Χρηματηριστηριακές Συναλλαγές \& Συναλλάγμα}{3}{chapter.1}
+\contentsline {section}{\numberline {1.1}Εισαγωγή στις Χηματιστηριακές Συναλλαγές}{3}{section.1.1}
+\contentsline {chapter}{\numberline {2}Απεικόνιση Δεδομένων}{5}{chapter.2}
+\contentsline {section}{\numberline {2.1}Τι είναι η Απεικόνιση Δεδομένων}{5}{section.2.1}
+\contentsline {chapter}{\numberline {3}Συστήματα Συστάσεων}{7}{chapter.3}
+\contentsline {section}{\numberline {3.1}Εισαγωγή στα Συστήματα Συστάσεων}{7}{section.3.1}
+\contentsline {section}{\numberline {3.2}Τύποι Συστημάτων Συστάσεων}{7}{section.3.2}
+\contentsline {section}{\numberline {3.3}Συνεργατικό Φιλτράρισμα με χρήση Μοντέλου Λανθανουσών Παραγόντων με Έμμεσες Αξιολογήσεις }{9}{section.3.3}
+\contentsline {chapter}{\numberline {4}Η Πλατφόρμα Visfx}{13}{chapter.4}
+\contentsline {section}{\numberline {4.1}Αρχιτεκτονική}{13}{section.4.1}
+\contentsline {section}{\numberline {4.2}Docker}{14}{section.4.2}
+\contentsline {section}{\numberline {4.3}Αποθήκευση και ανάκτηση Δεδομένων}{15}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}PostgreSQL}{15}{subsection.4.3.1}
+\contentsline {subsection}{\numberline {4.3.2}Elasticsearch \& Logstash}{15}{subsection.4.3.2}
+\contentsline {section}{\numberline {4.4}Ανάλυση Δεδομέων}{15}{section.4.4}
+\contentsline {section}{\numberline {4.5}Παρουσίαση \& Απεικόνιση δεδομένων}{15}{section.4.5}
+\contentsline {subsection}{\numberline {4.5.1}d3.js, dc.js, crossfilter.js}{15}{subsection.4.5.1}
+\contentsline {chapter}{\numberline {5}Σενάριο Χρήσης Visfx}{17}{chapter.5}
+\contentsline {section}{\numberline {5.1}Εισαγωγή}{17}{section.5.1}
+\contentsline {section}{\numberline {5.2}Επισκόπηση Δεδομένων – Data Overview}{17}{section.5.2}
+\contentsline {section}{\numberline {5.3}Επιλογή Χαρακτηριστικών – Feature Selection}{23}{section.5.3}
+\contentsline {section}{\numberline {5.4}Παρουσίαση Συστάσεων}{27}{section.5.4}
+\contentsline {chapter}{\numberline {6}Συμπεράσματα}{31}{chapter.6}
+\contentsline {chapter}{Βιβλιογραφία}{33}{chapter*.22}
